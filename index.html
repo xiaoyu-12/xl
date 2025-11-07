@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>爱人如养花</title>
+  <title>陪你一年又一年</title>
   <style>
     body {
       margin: 0;
@@ -43,22 +43,91 @@
       50% { opacity: 1; }
     }
 
-    /* 飘落的自拍图片样式 */
-    .floating-image {
+    /* 坠落的爱心字体图标样式 */
+    .falling-heart-icon {
       position: absolute;
       pointer-events: none;
       z-index: 3;
-      opacity: 0.95;
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+      font-size: var(--size);
+      color: var(--color);
+      text-shadow: 0 0 10px var(--color), 0 0 20px rgba(255,255,255,0.3);
       animation: floatDown var(--duration) linear forwards;
       transform-origin: center;
-      object-fit: cover;
       transition: filter 0.3s ease;
     }
 
-    .floating-image:hover {
-      filter: brightness(1.05);
+    .falling-heart-icon:hover {
+      filter: brightness(1.2);
+    }
+
+    /* 带相框的坠落图片样式 */
+    .framed-image {
+      position: absolute;
+      pointer-events: none;
+      z-index: 4; /* 图片在爱心之上 */
+      animation: floatDown var(--duration) linear forwards;
+      transform-origin: center;
+      transition: filter 0.3s ease;
+    }
+
+    .frame {
+      position: relative;
+      padding: 8px; /* 相框边宽度 */
+      background: linear-gradient(135deg, #d4af37, #f8f0c0, #d4af37); /* 金色相框 */
+      border-radius: 4px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 
+                  0 0 15px rgba(212, 175, 55, 0.5); /* 相框阴影和光晕 */
+    }
+
+    .frame img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: 2px;
+      object-fit: cover;
+    }
+
+    /* 相框装饰角 */
+    .frame::before, .frame::after, .frame > span::before, .frame > span::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: transparent;
+      border: 3px solid #9b7b1b;
+      z-index: 1;
+    }
+
+    .frame::before {
+      top: 0;
+      left: 0;
+      border-right: none;
+      border-bottom: none;
+    }
+
+    .frame::after {
+      top: 0;
+      right: 0;
+      border-left: none;
+      border-bottom: none;
+    }
+
+    .frame > span::before {
+      bottom: 0;
+      left: 0;
+      border-right: none;
+      border-top: none;
+    }
+
+    .frame > span::after {
+      bottom: 0;
+      right: 0;
+      border-left: none;
+      border-top: none;
+    }
+
+    .framed-image:hover {
+      filter: brightness(1.1);
     }
 
     @keyframes floatDown {
@@ -408,82 +477,169 @@
     }
   }
 
-  // 飘落的自拍图片系统
-  const imageUrls = [
-    "https://c-ssl.duitang.com/uploads/blog/202107/25/20210725175542_fb2e5.jpg",
-    "https://ts2.tc.mm.bing.net/th/id/OIP-C.yC0kN3rkQul1IPDSxiiOAgHaQd?w=1080&h=2400&rs=1&pid=ImgDetMain&o=7&rm=3",
-    "https://n.sinaimg.cn/sinakd10111/246/w2000h3046/20200803/fe3a-ixeeirz6923891.jpg",
-    "https://p0.ssl.img.360kuai.com/t01650901df689a3ead.jpg",
-    "https://i0.hdslb.com/bfs/article/d50254d6259b99c9a94c82816f7395ca69ece729.jpg@1192w.avif",
-    "https://i0.hdslb.com/bfs/article/392ca36c7ab70da4903e9cfc7fd31313caf210b3.jpg@1160w_1750h.avif",
-    "https://i0.hdslb.com/bfs/article/f6730e03980b495b3c2eefeea381fc3f440a6224.jpg@1192w.avif",
-    "https://i0.hdslb.com/bfs/article/33d84e69e0445238ba665cf977832c434ebf93b2.jpg@1192w.avif",
-    "https://i0.hdslb.com/bfs/article/bd362e6f1586c81d082a234d34b6fdfe8cae6dd1.jpg@1192w.avif",
-    "https://i0.hdslb.com/bfs/article/c7f809082d29d87a9a90dbc744df6fba6a18e2ee.jpg@1192w_894h.avif",
-    "https://i0.hdslb.com/bfs/article/252622d4a935026698bddab92bdbb3a0d2a5b12b.jpg@1192w.avif"
-  ];
-
-  function createFloatingImage() {
-    const img = document.createElement('img');
-    img.className = 'floating-image';
+  // 坠落的爱心字体图标系统
+  function createFallingHeartIcon() {
+    const heartIcon = document.createElement('div');
+    heartIcon.className = 'falling-heart-icon';
     
-    // 随机选择图片
-    const randomImg = imageUrls[Math.floor(Math.random() * imageUrls.length)];
-    img.src = randomImg;
-    img.alt = "鞠婧祎自拍";
-
-    // 根据屏幕尺寸调整图片大小
+    // 使用爱心符号作为字体图标
+    heartIcon.textContent = '❤';
+    
+    // 随机爱心颜色
+    const heartColors = [
+      '#FF3B8B', '#FF5CA1', '#FF7EB0', '#FF2E55', '#FF0066',
+      '#FF5588', '#FF3399', '#FF66CC', '#FF99CC', '#FF33CC',
+      '#FFD700', '#FFA500', '#FF6347', '#00CED1', '#9370DB'
+    ];
+    const color = heartColors[Math.floor(Math.random() * heartColors.length)];
+    
+    // 根据屏幕尺寸调整爱心大小
     const isMobile = window.innerWidth < 768;
-    const size = isMobile ? 60 + Math.random() * 90 : 80 + Math.random() * 120;
-    img.style.width = `${size}px`;
-    img.style.height = 'auto';
-
+    const size = isMobile ? 24 + Math.random() * 36 : 32 + Math.random() * 48;
+    
     // 随机起始位置
     const startX = Math.random() * window.innerWidth;
     const startY = -size - Math.random() * 100;
-    img.style.left = `${startX}px`;
-    img.style.top = `${startY}px`;
-
+    
     // 随机动画时长
-    const duration = isMobile ? 6 + Math.random() * 5 : 8 + Math.random() * 7;
-    img.style.setProperty('--duration', `${duration}s`);
-
+    const duration = isMobile ? 4 + Math.random() * 4 : 6 + Math.random() * 6;
+    
     // 随机水平位移
-    const tx = isMobile ? (Math.random() - 0.5) * 150 : (Math.random() - 0.5) * 300;
-    img.style.setProperty('--tx', `${tx}px`);
-
+    const tx = isMobile ? (Math.random() - 0.5) * 180 : (Math.random() - 0.5) * 350;
+    
     // 垂直位移
     const ty = window.innerHeight + size + 100;
-    img.style.setProperty('--ty', `${ty}px`);
-
+    
     // 随机旋转角度
-    const rotation = (Math.random() - 0.5) * 40;
-    img.style.setProperty('--rotation', `${rotation}deg`);
-
+    const rotation = (Math.random() - 0.5) * 180;
+    
     // 随机缩放比例
-    const scale = 0.8 + Math.random() * 0.4;
-    img.style.setProperty('--scale', scale);
-
-    document.body.appendChild(img);
-
-    // 动画结束后移除
+    const scale = 0.7 + Math.random() * 0.6;
+    
+    // 设置样式
+    heartIcon.style.setProperty('--size', `${size}px`);
+    heartIcon.style.setProperty('--color', color);
+    heartIcon.style.setProperty('--duration', `${duration}s`);
+    heartIcon.style.setProperty('--tx', `${tx}px`);
+    heartIcon.style.setProperty('--ty', `${ty}px`);
+    heartIcon.style.setProperty('--rotation', `${rotation}deg`);
+    heartIcon.style.setProperty('--scale', scale);
+    heartIcon.style.left = `${startX}px`;
+    heartIcon.style.top = `${startY}px`;
+    
+    document.body.appendChild(heartIcon);
+    
+    // 动画结束后移除并添加粒子效果
     setTimeout(() => {
-      if (img.parentNode) {
-        // 图片消失时添加粒子效果
-        const rect = img.getBoundingClientRect();
+      if (heartIcon.parentNode) {
+        const rect = heartIcon.getBoundingClientRect();
         createParticles(rect.left + rect.width/2, rect.top + rect.height/2);
-        img.remove();
+        heartIcon.remove();
       }
     }, duration * 1000);
   }
 
-  function startFloatingImages() {
-    const intervalTime = window.innerWidth < 768 ? 1500 : 1200;
+  // 启动坠落爱心图标
+  function startFallingHeartIcons() {
+    const isMobile = window.innerWidth < 768;
+    const intervalTime = isMobile ? 1200 : 900;
     
     setInterval(() => {
       const probability = window.innerWidth < 768 ? 0.5 : 0.6;
       if (Math.random() > (1 - probability)) {
-        createFloatingImage();
+        createFallingHeartIcon();
+      }
+    }, intervalTime);
+  }
+
+  // 带相框的随机图片坠落系统
+  const imageUrls = [
+    "img/1.webp",
+    "img/2.webp",
+    "img/3.webp",
+    "img/4.webp",
+    "img/5.webp",
+    "img/6.webp",
+    "img/7.webp"
+  ];
+
+  function createFramedImage() {
+    // 创建外层容器
+    const container = document.createElement('div');
+    container.className = 'framed-image';
+    
+    // 创建相框元素
+    const frame = document.createElement('div');
+    frame.className = 'frame';
+    
+    // 创建装饰角的容器
+    const corners = document.createElement('span');
+    frame.appendChild(corners);
+    
+    // 创建图片元素
+    const img = document.createElement('img');
+    const randomImg = imageUrls[Math.floor(Math.random() * imageUrls.length)];
+    img.src = randomImg;
+    img.alt = "照片";
+    frame.appendChild(img);
+    
+    container.appendChild(frame);
+
+    // 根据屏幕尺寸调整图片大小
+    const isMobile = window.innerWidth < 768;
+    const size = isMobile ? 80 + Math.random() * 100 : 120 + Math.random() * 140;
+    container.style.width = `${size}px`;
+    container.style.height = `${size * 1.2}px`; // 保持一定的宽高比
+
+    // 随机起始位置
+    const startX = Math.random() * window.innerWidth;
+    const startY = -size - Math.random() * 100;
+    container.style.left = `${startX}px`;
+    container.style.top = `${startY}px`;
+
+    // 随机动画时长（比爱心稍慢）
+    const duration = isMobile ? 7 + Math.random() * 6 : 9 + Math.random() * 8;
+    container.style.setProperty('--duration', `${duration}s`);
+
+    // 随机水平位移（比爱心更大）
+    const tx = isMobile ? (Math.random() - 0.5) * 200 : (Math.random() - 0.5) * 400;
+    container.style.setProperty('--tx', `${tx}px`);
+
+    // 垂直位移
+    const ty = window.innerHeight + size + 100;
+    container.style.setProperty('--ty', `${ty}px`);
+
+    // 随机旋转角度（比爱心幅度小一些）
+    const rotation = (Math.random() - 0.5) * 60;
+    container.style.setProperty('--rotation', `${rotation}deg`);
+
+    // 随机缩放比例
+    const scale = 0.6 + Math.random() * 0.5;
+    container.style.setProperty('--scale', scale);
+
+    document.body.appendChild(container);
+
+    // 动画结束后移除
+    setTimeout(() => {
+      if (container.parentNode) {
+        // 图片消失时添加粒子效果
+        const rect = container.getBoundingClientRect();
+        createParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+        container.remove();
+      }
+    }, duration * 1000);
+  }
+
+  // 启动带相框的图片坠落
+  function startFramedImages() {
+    const isMobile = window.innerWidth < 768;
+    // 图片出现频率低于爱心
+    const intervalTime = isMobile ? 3000 : 2500;
+    
+    setInterval(() => {
+      const probability = window.innerWidth < 768 ? 0.4 : 0.5;
+      if (Math.random() > (1 - probability)) {
+        createFramedImage();
       }
     }, intervalTime);
   }
@@ -509,13 +665,23 @@
     "今天过得开心嘛", "保持微笑呀", "每天都要元气满满", "记得吃水果", "早点休息",
     "好好爱自己", "梦想成真", "愿所有烦恼都消失", "天冷了，多穿衣服", "别熬夜",
     "顺顺利利", "喝水哦~", "加油！", "一切都会好起来的", "你是最棒的！",
-    "世界因你而温柔", "慢慢来，别着急", "你值得被爱", "今天也很努力吧？", "星星会照亮你"
+    "世界因你而温柔", "慢慢来，别着急", "你值得被爱", "今天也很努力吧？", "星星会照亮你",
+    "我想你了","记得好好护肤","你超棒的","学会爱自己","保持好心情","冷，多穿衣服","期待下一次见面",
+    "珍惜每一刻","爱你哦","lucky","万事开头难","你能行的","我在","星河为你闪烁","美的冒泡",
+    "小心感冒","不难的","平平安安","无忧无虑","每天都喜欢你多一点"
   ];
 
   const messageColors = [
-    "rgba(255, 105, 180, 0.9)", "rgba(138, 43, 226, 0.9)", "rgba(70, 130, 180, 0.9)",
-    "rgba(60, 179, 113, 0.9)", "rgba(255, 165, 0, 0.9)", "rgba(255, 99, 71, 0.9)",
-    "rgba(106, 90, 205, 0.9)", "rgba(30, 144, 255, 0.9)"
+    "rgba(255, 105, 180, 0.9)", "rgba(138, 43, 226, 0.8)", "rgba(70, 130, 180, 0.5)",
+    "rgba(60, 179, 113, 0.6)", "rgba(255, 165, 0, 0.9)", "rgba(255, 99, 71, 0.6)",
+    "rgba(106, 90, 205, 0.5)", "rgba(30, 144, 255, 0.7)", "rgba(222, 54, 32, 0.7)",
+    "rgba(66, 90, 43, 0.5)", "rgba(77, 90, 255, 0.7)", "rgba(66, 54, 34, 0.7)",
+    "rgba(44, 179, 167, 0.6)", "rgba(233, 59, 0, 0.9)", "rgba(0, 0, 0, 0.6)",
+        "rgba(34, 66, 11, 0.9)", "rgba(1, 9, 200, 0.8)", "rgba(44, 67, 180, 0.5)",
+    "rgba(33, 179, 66, 0.6)", "rgba(33, 165, 0, 0.9)", "rgba(99, 99, 71, 0.6)",
+    "rgba(106, 90, 123, 0.5)", "rgba(30, 234, 255, 0.7)", "rgba(23, 54, 32, 0.7)",
+    "rgba(66, 90, 88, 0.5)", "rgba(77, 66, 255, 0.7)", "rgba(66, 0, 34, 0.7)",
+    "rgba(44, 255, 167, 0.6)", "rgba(255, 59, 55, 0.9)", "rgba(0, 0, 0, 0.6)"
   ];
 
   let active = true;
@@ -578,7 +744,8 @@
   // 启动系统
   window.addEventListener('load', () => {
     createStars();
-    startFloatingImages();
+    startFallingHeartIcons(); // 启动坠落爱心字体图标
+    startFramedImages(); // 启动带相框的图片坠落
     startHearts(); // 启动爱心飘花
 
     // 消息频率控制
