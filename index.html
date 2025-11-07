@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>爱人如养花</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background: radial-gradient(ellipse at bottom, #2c3e50 0%, #0a0e17 100%);
+      overflow: hidden;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      position: relative;
+    }
+
+    /* 星星背景增强 */
+    .stars {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    .star {
+      position: absolute;
+      background-color: white;
+      border-radius: 50%;
+      animation: twinkle 2s infinite ease-in-out;
+    }
+
+    .star.large {
+      width: 2px;
+      height: 2px;
+      box-shadow: 0 0 6px rgba(255,255,255,0.8);
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    /* 飘落的自拍图片样式 */
+    .floating-image {
+      position: absolute;
+      pointer-events: none;
+      z-index: 3;
+      opacity: 0.95;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+      animation: floatDown var(--duration) linear forwards;
+      transform-origin: center;
+      object-fit: cover;
+      transition: filter 0.3s ease;
+    }
+
+    .floating-image:hover {
+      filter: brightness(1.05);
+    }
+
+    @keyframes floatDown {
+      0% {
+        transform: translate(0, 0) rotate(0deg) scale(var(--scale));
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.95;
+      }
+      90% {
+        opacity: 0.95;
+      }
+      100% {
+        transform: translate(var(--tx), var(--ty)) rotate(var(--rotation)) scale(var(--scale));
+        opacity: 0;
+      }
+    }
+
+    /* 爱心飘花效果 */
+    .heart {
+      position: absolute;
+      pointer-events: none;
+      z-index: 2;
+      animation: heartFloat var(--duration) ease-in-out forwards;
+      transform-origin: center;
+      opacity: 0.8;
+    }
+
+    .heart::before, .heart::after {
+      content: '';
+      position: absolute;
+      width: var(--size);
+      height: var(--size);
+      background-color: var(--color);
+      border-radius: 50%;
+    }
+
+    .heart::before {
+      top: calc(-50% + 1px);
+      left: 0;
+      box-shadow: 0 0 15px var(--color);
+    }
+
+    .heart::after {
+      top: 0;
+      left: calc(50% - 1px);
+      box-shadow: 0 0 15px var(--color);
+    }
+
+    .heart::before, .heart::after {
+      transform: rotate(-45deg);
+    }
+
+    .heart::before {
+      transform: rotate(45deg) translate(31%, 31%);
+    }
+
+    @keyframes heartFloat {
+      0% {
+        transform: translate(0, 0) rotate(0deg) scale(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.8;
+      }
+      90% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: translate(var(--tx), var(--ty)) rotate(var(--rotation)) scale(1);
+        opacity: 0;
+      }
+    }
+
+    /* 标题样式 - 增强光晕 */
+    .title {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: clamp(1.8rem, 6vw, 3rem);
+      text-shadow: 0 0 10px rgba(255,255,255,0.8), 
+                   0 0 20px rgba(255,255,255,0.5),
+                   0 0 30px rgba(255,105,180,0.6);
+      z-index: 10;
+      opacity: 0;
+      animation: fadeIn 3s forwards 1s;
+      pointer-events: none;
+      text-align: center;
+      width: 90%;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    /* 美化后的弹窗样式 - 增强特效 */
+    .message-box {
+      position: absolute;
+      padding: 14px 18px;
+      border-radius: 18px;
+      font-size: clamp(15px, 4vw, 17px);
+      font-weight: 500;
+      color: #fff;
+      max-width: 70%;
+      word-wrap: break-word;
+      z-index: 9999;
+      opacity: 0;
+      transform: scale(0.8) translateY(10px);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2),
+                  0 0 15px rgba(255,255,255,0.15);
+      cursor: pointer;
+      overflow: hidden;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .message-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(rgba(255,255,255,0.1) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .message-box::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 24px;
+      height: 24px;
+      background: radial-gradient(circle at 70% 70%, rgba(255,255,255,0.2), transparent 70%);
+      border-radius: 50%;
+    }
+
+    .message-box.show {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      animation: pulse 3s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 6px 20px rgba(0,0,0,0.2), 0 0 15px rgba(255,255,255,0.15); }
+      50% { box-shadow: 0 6px 25px rgba(0,0,0,0.25), 0 0 20px rgba(255,255,255,0.2); }
+    }
+
+    .message-box.fade-out {
+      opacity: 0;
+      transform: translateY(-20px) scale(0.9);
+    }
+
+    /* 底部提示 */
+    .hint {
+      position: absolute;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.7);
+      font-size: clamp(12px, 3vw, 14px);
+      z-index: 100;
+      opacity: 0;
+      animation: fadeIn 1s forwards 2s;
+      text-align: center;
+      width: 90%;
+      line-height: 1.5;
+    }
+
+    /* 触摸反馈样式 */
+    .touch-feedback {
+      position: fixed;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      transform: scale(0);
+      pointer-events: none;
+      z-index: 99999;
+      animation: touchEffect 0.6s ease-out forwards;
+    }
+
+    @keyframes touchEffect {
+      0% { transform: scale(0); opacity: 1; }
+      70% { transform: scale(1); opacity: 0.5; }
+      100% { transform: scale(1.2); opacity: 0; }
+    }
+
+    /* 粒子特效 */
+    .particle {
+      position: absolute;
+      background-color: white;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+      animation: particleFloat var(--duration) ease-in-out forwards;
+    }
+
+    @keyframes particleFloat {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100px) scale(0);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1 class="title">爱人如养花</h1>
+  <div class="hint">点击或触摸屏幕可清除所有消息<br>等待60s,有惊喜哦！</div>
+  <div class="stars"></div>
+
+<script>
+  // 创建星星背景（增强版）
+  function createStars() {
+    const starsContainer = document.querySelector('.stars');
+    const starCount = window.innerWidth < 768 ? 150 : 300;
+    
+    for (let i = 0; i < starCount; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      
+      // 随机大小和亮度
+      const size = Math.random() * 1.5 + 0.5;
+      star.style.width = `${size}px`;
+      star.style.height = `${size}px`;
+      
+      // 随机位置
+      const x = Math.random() * 100;
+      const y = Math.random() * 100;
+      star.style.left = `${x}%`;
+      star.style.top = `${y}%`;
+      
+      // 随机动画参数
+      const delay = Math.random() * 5;
+      const duration = Math.random() * 3 + 1;
+      star.style.animationDelay = `${delay}s`;
+      star.style.animationDuration = `${duration}s`;
+      
+      // 随机亮度
+      const opacity = Math.random() * 0.7 + 0.3;
+      star.style.opacity = opacity;
+      
+      // 大星星有额外光晕
+      if (size > 1.5) {
+        star.classList.add('large');
+      }
+      
+      starsContainer.appendChild(star);
+    }
+  }
+
+  // 爱心飘花效果
+  function createHeart() {
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    
+    // 爱心颜色
+    const heartColors = [
+      '#FF6B8B', '#FF85A1', '#FF9EB0', '#FFB7C5', '#FFCEDF',
+      '#FF85CF', '#FF99D9', '#FFADD4', '#FFC2E2', '#FFD6ED'
+    ];
+    const color = heartColors[Math.floor(Math.random() * heartColors.length)];
+    
+    // 爱心大小
+    const isMobile = window.innerWidth < 768;
+    const size = isMobile ? 8 + Math.random() * 12 : 12 + Math.random() * 16;
+    
+    // 起始位置
+    const startX = Math.random() * window.innerWidth;
+    const startY = -50;
+    
+    // 动画参数
+    const duration = isMobile ? 5 + Math.random() * 4 : 7 + Math.random() * 5;
+    const tx = (Math.random() - 0.5) * (isMobile ? 100 : 200);
+    const ty = window.innerHeight + 50;
+    const rotation = (Math.random() - 0.5) * 120; // 旋转更灵动
+    
+    // 设置样式
+    heart.style.setProperty('--size', `${size}px`);
+    heart.style.setProperty('--color', color);
+    heart.style.setProperty('--duration', `${duration}s`);
+    heart.style.setProperty('--tx', `${tx}px`);
+    heart.style.setProperty('--ty', `${ty}px`);
+    heart.style.setProperty('--rotation', `${rotation}deg`);
+    heart.style.left = `${startX}px`;
+    heart.style.top = `${startY}px`;
+    
+    document.body.appendChild(heart);
+    
+    // 动画结束后移除
+    setTimeout(() => {
+      if (heart.parentNode) heart.remove();
+    }, duration * 1000);
+  }
+
+  // 启动爱心飘花
+  function startHearts() {
+    const isMobile = window.innerWidth < 768;
+    const interval = isMobile ? 600 : 400;
+    
+    setInterval(() => {
+      if (Math.random() > 0.7) { // 30%概率生成
+        createHeart();
+      }
+    }, interval);
+  }
+
+  // 粒子特效
+  function createParticles(x, y) {
+    const particleCount = 8 + Math.floor(Math.random() * 6);
+    
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      
+      // 随机大小
+      const size = 1 + Math.random() * 3;
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+      
+      // 位置
+      particle.style.left = `${x}px`;
+      particle.style.top = `${y}px`;
+      
+      // 随机动画
+      const duration = 0.8 + Math.random() * 1.2;
+      const angle = (i / particleCount) * Math.PI * 2;
+      const distance = 15 + Math.random() * 15;
+      
+      particle.style.setProperty('--duration', `${duration}s`);
+      particle.style.transform = `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px)`;
+      
+      document.body.appendChild(particle);
+      
+      // 移除粒子
+      setTimeout(() => {
+        if (particle.parentNode) particle.remove();
+      }, duration * 1000);
+    }
+  }
+
+  // 飘落的自拍图片系统
+  const imageUrls = [
+    "https://c-ssl.duitang.com/uploads/blog/202107/25/20210725175542_fb2e5.jpg",
+    "https://ts2.tc.mm.bing.net/th/id/OIP-C.yC0kN3rkQul1IPDSxiiOAgHaQd?w=1080&h=2400&rs=1&pid=ImgDetMain&o=7&rm=3",
+    "https://n.sinaimg.cn/sinakd10111/246/w2000h3046/20200803/fe3a-ixeeirz6923891.jpg",
+    "https://p0.ssl.img.360kuai.com/t01650901df689a3ead.jpg",
+    "https://i0.hdslb.com/bfs/article/d50254d6259b99c9a94c82816f7395ca69ece729.jpg@1192w.avif",
+    "https://i0.hdslb.com/bfs/article/392ca36c7ab70da4903e9cfc7fd31313caf210b3.jpg@1160w_1750h.avif",
+    "https://i0.hdslb.com/bfs/article/f6730e03980b495b3c2eefeea381fc3f440a6224.jpg@1192w.avif",
+    "https://i0.hdslb.com/bfs/article/33d84e69e0445238ba665cf977832c434ebf93b2.jpg@1192w.avif",
+    "https://i0.hdslb.com/bfs/article/bd362e6f1586c81d082a234d34b6fdfe8cae6dd1.jpg@1192w.avif",
+    "https://i0.hdslb.com/bfs/article/c7f809082d29d87a9a90dbc744df6fba6a18e2ee.jpg@1192w_894h.avif",
+    "https://i0.hdslb.com/bfs/article/252622d4a935026698bddab92bdbb3a0d2a5b12b.jpg@1192w.avif"
+  ];
+
+  function createFloatingImage() {
+    const img = document.createElement('img');
+    img.className = 'floating-image';
+    
+    // 随机选择图片
+    const randomImg = imageUrls[Math.floor(Math.random() * imageUrls.length)];
+    img.src = randomImg;
+    img.alt = "鞠婧祎自拍";
+
+    // 根据屏幕尺寸调整图片大小
+    const isMobile = window.innerWidth < 768;
+    const size = isMobile ? 60 + Math.random() * 90 : 80 + Math.random() * 120;
+    img.style.width = `${size}px`;
+    img.style.height = 'auto';
+
+    // 随机起始位置
+    const startX = Math.random() * window.innerWidth;
+    const startY = -size - Math.random() * 100;
+    img.style.left = `${startX}px`;
+    img.style.top = `${startY}px`;
+
+    // 随机动画时长
+    const duration = isMobile ? 6 + Math.random() * 5 : 8 + Math.random() * 7;
+    img.style.setProperty('--duration', `${duration}s`);
+
+    // 随机水平位移
+    const tx = isMobile ? (Math.random() - 0.5) * 150 : (Math.random() - 0.5) * 300;
+    img.style.setProperty('--tx', `${tx}px`);
+
+    // 垂直位移
+    const ty = window.innerHeight + size + 100;
+    img.style.setProperty('--ty', `${ty}px`);
+
+    // 随机旋转角度
+    const rotation = (Math.random() - 0.5) * 40;
+    img.style.setProperty('--rotation', `${rotation}deg`);
+
+    // 随机缩放比例
+    const scale = 0.8 + Math.random() * 0.4;
+    img.style.setProperty('--scale', scale);
+
+    document.body.appendChild(img);
+
+    // 动画结束后移除
+    setTimeout(() => {
+      if (img.parentNode) {
+        // 图片消失时添加粒子效果
+        const rect = img.getBoundingClientRect();
+        createParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+        img.remove();
+      }
+    }, duration * 1000);
+  }
+
+  function startFloatingImages() {
+    const intervalTime = window.innerWidth < 768 ? 1500 : 1200;
+    
+    setInterval(() => {
+      const probability = window.innerWidth < 768 ? 0.5 : 0.6;
+      if (Math.random() > (1 - probability)) {
+        createFloatingImage();
+      }
+    }, intervalTime);
+  }
+
+  // 触摸反馈效果
+  function createTouchFeedback(x, y) {
+    const feedback = document.createElement('div');
+    feedback.className = 'touch-feedback';
+    feedback.style.left = `${x}px`;
+    feedback.style.top = `${y}px`;
+    document.body.appendChild(feedback);
+    
+    // 创建触摸粒子
+    createParticles(x, y);
+    
+    setTimeout(() => {
+      if (feedback.parentNode) feedback.remove();
+    }, 600);
+  }
+
+  // 祝福弹窗系统
+  const messages = [
+    "今天过得开心嘛", "保持微笑呀", "每天都要元气满满", "记得吃水果", "早点休息",
+    "好好爱自己", "梦想成真", "愿所有烦恼都消失", "天冷了，多穿衣服", "别熬夜",
+    "顺顺利利", "喝水哦~", "加油！", "一切都会好起来的", "你是最棒的！",
+    "世界因你而温柔", "慢慢来，别着急", "你值得被爱", "今天也很努力吧？", "星星会照亮你"
+  ];
+
+  const messageColors = [
+    "rgba(255, 105, 180, 0.9)", "rgba(138, 43, 226, 0.9)", "rgba(70, 130, 180, 0.9)",
+    "rgba(60, 179, 113, 0.9)", "rgba(255, 165, 0, 0.9)", "rgba(255, 99, 71, 0.9)",
+    "rgba(106, 90, 205, 0.9)", "rgba(30, 144, 255, 0.9)"
+  ];
+
+  let active = true;
+
+  function createMessage() {
+    if (!active) return;
+    const msg =  messages[Math.floor(Math.random() * messages.length)];
+    const color = messageColors[Math.floor(Math.random() * messageColors.length)];
+    const box = document.createElement('div');
+    box.className = 'message-box';
+    box.textContent = msg;
+    box.style.backgroundColor = color;
+
+    // 随机位置
+    const isMobile = window.innerWidth < 768;
+    const margin = isMobile ? 15 : 5;
+    const x = margin + Math.random() * (window.innerWidth - 270 - margin * 2);
+    const y = margin + Math.random() * (window.innerHeight - 130 - margin * 2);
+    box.style.left = `${x}px`;
+    box.style.top = `${y}px`;
+
+    // 随机内边距
+    const padY = isMobile ? 10 + Math.floor(Math.random() * 5) : 12 + Math.floor(Math.random() * 6);
+    const padX = isMobile ? 16 + Math.floor(Math.random() * 8) : 20 + Math.floor(Math.random() * 10);
+    box.style.padding = `${padY}px ${padX}px`;
+
+    // 圆角
+    const radius = 15 + Math.floor(Math.random() * 10);
+    box.style.borderRadius = `${radius}px`;
+
+    // 点击单个消息可移除
+    box.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // 移除时添加粒子效果
+      const rect = box.getBoundingClientRect();
+      createParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+      removeMessage(box);
+    });
+
+    document.body.appendChild(box);
+    setTimeout(() => box.classList.add('show'), 10);
+
+    // 自动消失
+    const lifetime = isMobile ? 3000 + Math.random() * 2000 : 4000 + Math.random() * 3000;
+    setTimeout(() => {
+      if (box.parentNode) {
+        createParticles(box.offsetLeft + box.offsetWidth/2, box.offsetTop + box.offsetHeight/2);
+        removeMessage(box);
+      }
+    }, lifetime);
+  }
+
+  // 移除消息框的动画
+  function removeMessage(box) {
+    box.classList.remove('show');
+    box.classList.add('fade-out');
+    setTimeout(() => box.remove(), 300);
+  }
+
+  // 启动系统
+  window.addEventListener('load', () => {
+    createStars();
+    startFloatingImages();
+    startHearts(); // 启动爱心飘花
+
+    // 消息频率控制
+    const isMobile = window.innerWidth < 768;
+    let msgIntervalTime = isMobile ? 900 : 700;
+    
+    let msgInterval = setInterval(() => {
+      if (!active) return;
+      
+      const maxCount = isMobile ? 2 : 3;
+      const count = Math.max(1, Math.floor(maxCount - (60000 - (Date.now() - startTime)) / 20000));
+      
+      for (let i = 0; i < count; i++) {
+        setTimeout(createMessage, i * 50);
+      }
+      
+      msgIntervalTime = Math.min(isMobile ? 1800 : 2000, msgIntervalTime + (isMobile ? 6 : 8));
+      clearInterval(msgInterval);
+      msgInterval = setInterval(() => {
+        if (!active) return;
+        const count = Math.max(1, Math.floor(maxCount - (60000 - (Date.now() - startTime)) / 20000));
+        for (let i = 0; i < count; i++) {
+          setTimeout(createMessage, i * 50);
+        }
+      }, msgIntervalTime);
+    }, msgIntervalTime);
+
+    const startTime = Date.now();
+    
+    // 60秒后停止弹窗
+    setTimeout(() => {
+      active = false;
+      clearInterval(msgInterval);
+      
+      // 显示结束提示
+      const endHint = document.createElement('div');
+      endHint.className = 'message-box';
+      endHint.textContent = '祝福已送达，愿你被世界温柔以待 ❤️';
+      endHint.style.backgroundColor = 'rgba(255, 105, 180, 0.9)';
+      endHint.style.left = '50%';
+      endHint.style.top = '50%';
+      endHint.style.transform = 'translate(-50%, -50%) scale(0.7)';
+      endHint.style.textAlign = 'center';
+      endHint.style.maxWidth = '80%';
+      endHint.style.zIndex = '10000';
+      
+      document.body.appendChild(endHint);
+      setTimeout(() => endHint.classList.add('show'), 10);
+      
+    }, 60000);
+  });
+
+  // 点击/触摸清空所有弹窗
+  function handleClearMessages(e) {
+    createTouchFeedback(e.clientX || e.touches[0].clientX, e.clientY || e.touches[0].clientY);
+    
+    document.querySelectorAll('.message-box').forEach(el => {
+      createParticles(el.offsetLeft + el.offsetWidth/2, el.offsetTop + el.offsetHeight/2);
+      el.classList.remove('show');
+      el.classList.add('fade-out');
+      setTimeout(() => el.remove(), 300);
+    });
+  }
+
+  document.addEventListener('click', handleClearMessages);
+  document.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    handleClearMessages(e);
+  }, { passive: false });
+
+  // 窗口大小变化时重新调整
+  window.addEventListener('resize', () => {
+    document.querySelectorAll('.star').forEach(star => star.remove());
+    createStars();
+  });
+</script>
+
+</body>
+</html>
