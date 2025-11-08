@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>陪你一年又一年</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background: radial-gradient(ellipse at bottom, #2c3e50 0%, #0a0e17 100%);
+      overflow: hidden;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      position: relative;
+    }
+
+    /* 星星背景增强 */
+    .stars {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    .star {
+      position: absolute;
+      background-color: white;
+      border-radius: 50%;
+      animation: twinkle 2s infinite ease-in-out;
+    }
+
+    .star.large {
+      width: 2px;
+      height: 2px;
+      box-shadow: 0 0 6px rgba(255,255,255,0.8);
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    /* 暖冬雪花特效 - 新增 */
+    .snowflake {
+      position: absolute;
+      pointer-events: none;
+      z-index: 2;
+      color: #fff;
+      opacity: 0.7;
+      animation: snowFloat var(--duration) linear forwards;
+      transform-origin: center;
+    }
+
+    @keyframes snowFloat {
+      0% { transform: translate(0, -50px) rotate(0deg) scale(var(--scale)); opacity: 0; }
+      10% { opacity: 0.7; }
+      90% { opacity: 0.7; }
+      100% { transform: translate(var(--tx), 100vh) rotate(var(--rotation)) scale(var(--scale)); opacity: 0; }
+    }
+
+    /* 暖冬暖光特效 - 新增 */
+    .warm-light {
+      position: absolute;
+      pointer-events: none;
+      z-index: 1;
+      width: var(--size);
+      height: var(--size);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,215,0,0.3), rgba(255,165,0,0.1));
+      box-shadow: 0 0 20px rgba(255,215,0,0.2), 0 0 40px rgba(255,165,0,0.1);
+      animation: lightPulse var(--duration) ease-in-out forwards;
+    }
+
+    @keyframes lightPulse {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.2); }
+    }
+
+    /* 暖冬结束粒子特效 - 新增 */
+    .winter-particle {
+      position: absolute;
+      pointer-events: none;
+      z-index: 5;
+      background: var(--color);
+      border-radius: 50%;
+      animation: winterParticleFloat var(--duration) ease-in-out forwards;
+    }
+
+    @keyframes winterParticleFloat {
+      0% { transform: scale(1) translateY(0); opacity: 1; }
+      100% { transform: scale(0.2) translateY(-150px); opacity: 0; }
+    }
+
+    /* 坠落的爱心字体图标样式 */
+    .falling-heart-icon {
+      position: absolute;
+      pointer-events: none;
+      z-index: 3;
+      font-size: var(--size);
+      color: var(--color);
+      text-shadow: 0 0 10px var(--color), 0 0 20px rgba(255,255,255,0.3);
+      animation: floatDown var(--duration) linear forwards;
+      transform-origin: center;
+      transition: filter 0.3s ease;
+    }
+
+    .falling-heart-icon:hover {
+      filter: brightness(1.2);
+    }
+
+    /* 带相框的坠落图片样式 */
+    .framed-image {
+      position: absolute;
+      pointer-events: none;
+      z-index: 4; /* 图片在爱心之上 */
+      animation: floatDown var(--duration) linear forwards;
+      transform-origin: center;
+      transition: filter 0.3s ease;
+    }
+
+    .frame {
+      position: relative;
+      padding: 8px; /* 相框边宽度 */
+      background: linear-gradient(135deg, #d4af37, #f8f0c0, #d4af37); /* 金色相框 */
+      border-radius: 4px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 
+                  0 0 15px rgba(212, 175, 55, 0.5); /* 相框阴影和光晕 */
+    }
+
+    .frame img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: 2px;
+      object-fit: cover;
+    }
+
+    /* 相框装饰角 */
+    .frame::before, .frame::after, .frame > span::before, .frame > span::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: transparent;
+      border: 3px solid #9b7b1b;
+      z-index: 1;
+    }
+
+    .frame::before {
+      top: 0;
+      left: 0;
+      border-right: none;
+      border-bottom: none;
+    }
+
+    .frame::after {
+      top: 0;
+      right: 0;
+      border-left: none;
+      border-bottom: none;
+    }
+
+    .frame > span::before {
+      bottom: 0;
+      left: 0;
+      border-right: none;
+      border-top: none;
+    }
+
+    .frame > span::after {
+      bottom: 0;
+      right: 0;
+      border-left: none;
+      border-top: none;
+    }
+
+    .framed-image:hover {
+      filter: brightness(1.1);
+    }
+
+    @keyframes floatDown {
+      0% {
+        transform: translate(0, 0) rotate(0deg) scale(var(--scale));
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.95;
+      }
+      90% {
+        opacity: 0.95;
+      }
+      100% {
+        transform: translate(var(--tx), var(--ty)) rotate(var(--rotation)) scale(var(--scale));
+        opacity: 0;
+      }
+    }
+
+    /* 爱心飘花效果 */
+    .heart {
+      position: absolute;
+      pointer-events: none;
+      z-index: 2;
+      animation: heartFloat var(--duration) ease-in-out forwards;
+      transform-origin: center;
+      opacity: 0.8;
+    }
+
+    .heart::before, .heart::after {
+      content: '';
+      position: absolute;
+      width: var(--size);
+      height: var(--size);
+      background-color: var(--color);
+      border-radius: 50%;
+    }
+
+    .heart::before {
+      top: calc(-50% + 1px);
+      left: 0;
+      box-shadow: 0 0 15px var(--color);
+    }
+
+    .heart::after {
+      top: 0;
+      left: calc(50% - 1px);
+      box-shadow: 0 0 15px var(--color);
+    }
+
+    .heart::before, .heart::after {
+      transform: rotate(-45deg);
+    }
+
+    .heart::before {
+      transform: rotate(45deg) translate(31%, 31%);
+    }
+
+    @keyframes heartFloat {
+      0% {
+        transform: translate(0, 0) rotate(0deg) scale(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.8;
+      }
+      90% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: translate(var(--tx), var(--ty)) rotate(var(--rotation)) scale(1);
+        opacity: 0;
+      }
+    }
+
+    /* 标题样式 - 暖冬主题调整 */
+    .title {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: clamp(1.8rem, 6vw, 3rem);
+      text-shadow: 0 0 10px rgba(255,255,255,0.8), 
+                   0 0 20px rgba(255,215,0,0.5), /* 暖光光晕 */
+                   0 0 30px rgba(255,165,0,0.4);
+      z-index: 10;
+      opacity: 0;
+      animation: fadeIn 3s forwards 1s;
+      pointer-events: none;
+      text-align: center;
+      width: 90%;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    /* 暖冬信封弹窗样式 - 调整为暖冬主题 */
+    .message-box {
+      position: absolute;
+      padding: 12px 16px;
+      border-radius: 12px; /* 圆润信封感 */
+      font-size: clamp(14px, 3.5vw, 16px);
+      font-weight: 500;
+      color: #fff;
+      max-width: 60%;
+      word-wrap: break-word;
+      z-index: 9999;
+      opacity: 0;
+      transform: scale(0.8) translateY(10px);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2),
+                  0 0 15px var(--glow-color); /* 暖光发光 */
+      cursor: pointer;
+      overflow: hidden;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      background: linear-gradient(135deg, var(--bg-color), var(--bg-color-dark));
+      /* 随机淡化动画 - 核心修改 */
+      animation: randomFade 4s infinite ease-in-out;
+    }
+
+    /* 随机淡化动画 - 实现弹窗随机透明度变化 */
+    @keyframes randomFade {
+      0% { opacity: 0.7 + Math.random() * 0.3; }
+      50% { opacity: 0.4 + Math.random() * 0.5; }
+      100% { opacity: 0.7 + Math.random() * 0.3; }
+    }
+
+    /* 信封右上角：粉红色小爱心 - 修改 */
+    .message-box::before {
+      content: '❤️'; /* 粉红色小爱心 */
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      width: 14px;
+      height: 14px;
+      font-size: 14px;
+      line-height: 1;
+      text-shadow: 0 0 3px rgba(255,255,255,0.5);
+    }
+
+    .message-box::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(rgba(255,255,255,0.05) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .message-box.show {
+      opacity: 0.9;
+      transform: scale(1) translateY(0);
+      /* 同时保留脉冲和随机淡化效果 */
+      animation: pulse 3s infinite ease-in-out, randomFade 4s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 6px 20px rgba(0,0,0,0.2), 0 0 15px var(--glow-color); }
+      50% { box-shadow: 0 6px 25px rgba(0,0,0,0.25), 0 0 20px var(--glow-color); }
+    }
+
+    /* 暖冬结束特效 - 信封聚合动画 */
+    .message-box.gather {
+      transition: all 1.8s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    /* 爱心轨迹动画类 - 核心新增 */
+    .message-box.heart-trace {
+      position: absolute;
+      z-index: 9999;
+      transition: none;
+      animation: heartTraceAnimation 6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    /* 爱心轨迹关键帧 - 精确模拟爱心形状路径 */
+    @keyframes heartTraceAnimation {
+      0% { transform: translate(0, 0) scale(0.8); opacity: 1; }
+      10% { transform: translate(calc(var(--hx1)), calc(var(--hy1))) scale(0.85); }
+      20% { transform: translate(calc(var(--hx2)), calc(var(--hy2))) scale(0.9); }
+      30% { transform: translate(calc(var(--hx3)), calc(var(--hy3))) scale(0.95); }
+      40% { transform: translate(calc(var(--hx4)), calc(var(--hy4))) scale(1); }
+      50% { transform: translate(calc(var(--hx5)), calc(var(--hy5))) scale(1.05); }
+      60% { transform: translate(calc(var(--hx6)), calc(var(--hy6))) scale(1); }
+      70% { transform: translate(calc(var(--hx7)), calc(var(--hy7))) scale(0.95); }
+      80% { transform: translate(calc(var(--hx8)), calc(var(--hy8))) scale(0.9); }
+      90% { transform: translate(calc(var(--hx9)), calc(var(--hy9))) scale(0.85); }
+      100% { transform: translate(calc(var(--hx10)), calc(var(--hy10))) scale(0.8); opacity: 0; }
+    }
+
+    .message-box.bloom {
+      animation: bloom 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+
+    @keyframes bloom {
+      0% { transform: scale(1) rotate(0deg); opacity: 1; }
+      50% { transform: scale(1.1) rotate(3deg); opacity: 0.9; }
+      100% { transform: scale(0.8) rotate(-3deg); opacity: 0; }
+    }
+
+    .message-box.fade-out {
+      opacity: 0;
+      transform: translateY(-20px) scale(0.9);
+    }
+
+    /* 底部提示 - 暖冬主题 */
+    .hint {
+      position: absolute;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.7);
+      font-size: clamp(12px, 3vw, 14px);
+      z-index: 100;
+      opacity: 0;
+      animation: fadeIn 1s forwards 2s;
+      text-align: center;
+      width: 90%;
+      line-height: 1.5;
+    }
+
+    /* 暖冬结束提示 - 向上移动修改 */
+    .winter-end-hint {
+      position: absolute;
+      top: 38%; /* 从50%改为38%，向上移动12% */
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      color: #fff;
+      font-size: clamp(1.5rem, 5vw, 2.2rem);
+      text-align: center;
+      z-index: 10000;
+      opacity: 0;
+      text-shadow: 0 0 15px rgba(255,215,0.6), 0 0 25px rgba(255,165,0,0.4);
+      animation: fadeInBloom 3s forwards 1s;
+      pointer-events: none;
+      width: 90%;
+      line-height: 1.6;
+    }
+
+    @keyframes fadeInBloom {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+      100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+
+    /* 触摸反馈样式 */
+    .touch-feedback {
+      position: fixed;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      transform: scale(0);
+      pointer-events: none;
+      z-index: 99999;
+      animation: touchEffect 0.6s ease-out forwards;
+    }
+
+    @keyframes touchEffect {
+      0% { transform: scale(0); opacity: 1; }
+      70% { transform: scale(1); opacity: 0.5; }
+      100% { transform: scale(1.2); opacity: 0; }
+    }
+
+    /* 粒子特效 - 暖冬白色+金色 */
+    .particle {
+      position: absolute;
+      background-color: var(--particle-color);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+      animation: particleFloat var(--duration) ease-in-out forwards;
+    }
+
+    @keyframes particleFloat {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100px) scale(0);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1 class="title">陪你一年又一年</h1>
+  <div class="stars"></div>
+
+<script>
+  // 存储所有弹窗元素，用于结束特效
+  let allMessageBoxes = [];
+  let startTime;
+
+  // 创建星星背景（增强版）
+  function createStars() {
+    const starsContainer = document.querySelector('.stars');
+    const starCount = window.innerWidth < 768 ? 150 : 300;
+    
+    for (let i = 0; i < starCount; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      
+      // 随机大小和亮度
+      const size = Math.random() * 1.5 + 0.5;
+      star.style.width = `${size}px`;
+      star.style.height = `${size}px`;
+      
+      // 随机位置（确保在屏幕内）
+      const x = Math.random() * 100;
+      const y = Math.random() * 100;
+      star.style.left = `${x}%`;
+      star.style.top = `${y}%`;
+      
+      // 随机动画参数
+      const delay = Math.random() * 5;
+      const duration = Math.random() * 3 + 1;
+      star.style.animationDelay = `${delay}s`;
+      star.style.animationDuration = `${duration}s`;
+      
+      // 随机亮度
+      const opacity = Math.random() * 0.7 + 0.3;
+      star.style.opacity = opacity;
+      
+      // 大星星有额外光晕
+      if (size > 1.5) {
+        star.classList.add('large');
+      }
+      
+      starsContainer.appendChild(star);
+    }
+  }
+
+  // 爱心飘花效果（限制在屏幕内）
+  function createHeart() {
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    
+    // 爱心颜色
+    const heartColors = [
+      '#FF6B8B', '#FF85A1', '#FF9EB0', '#FFB7C5', '#FFCEDF',
+      '#FF85CF', '#FF99D9', '#FFADD4', '#FFC2E2', '#FFD6ED'
+    ];
+    const color = heartColors[Math.floor(Math.random() * heartColors.length)];
+    
+    // 爱心大小
+    const isMobile = window.innerWidth < 768;
+    const size = isMobile ? 8 + Math.random() * 12 : 12 + Math.random() * 16;
+    const halfSize = size / 2; // 用于位置校准
+    
+    // 起始位置（确保左侧不超出屏幕，右侧不超出屏幕）
+    const maxStartX = window.innerWidth - size;
+    const startX = Math.random() * maxStartX; // 0 ~ (屏幕宽 - 爱心宽)
+    const startY = -50; // 从屏幕顶部外进入
+    
+    // 动画参数（确保结束位置在屏幕内，水平位移不超出边界）
+    const duration = isMobile ? 5 + Math.random() * 4 : 7 + Math.random() * 5;
+    const maxTx = isMobile ? 80 : 150; // 最大水平位移
+    // 计算水平位移范围，确保爱心始终在屏幕内
+    const txMin = -startX + halfSize; // 左边界限制（不能超出屏幕左边缘）
+    const txMax = (window.innerWidth - size - startX) - halfSize; // 右边界限制
+    const tx = Math.min(Math.max((Math.random() - 0.5) * maxTx * 2, txMin), txMax);
+    const ty = window.innerHeight + 50; // 从底部离开屏幕
+    const rotation = (Math.random() - 0.5) * 120; // 旋转更灵动
+    
+    // 设置样式
+    heart.style.setProperty('--size', `${size}px`);
+    heart.style.setProperty('--color', color);
+    heart.style.setProperty('--duration', `${duration}s`);
+    heart.style.setProperty('--tx', `${tx}px`);
+    heart.style.setProperty('--ty', `${ty}px`);
+    heart.style.setProperty('--rotation', `${rotation}deg`);
+    heart.style.left = `${startX}px`;
+    heart.style.top = `${startY}px`;
+    
+    document.body.appendChild(heart);
+    
+    // 动画结束后移除
+    setTimeout(() => {
+      if (heart.parentNode) heart.remove();
+    }, duration * 1000);
+  }
+
+  // 启动爱心飘花
+  function startHearts() {
+    const isMobile = window.innerWidth < 768;
+    const interval = isMobile ? 600 : 400;
+    
+    setInterval(() => {
+      if (Math.random() > 0.7) { // 30%概率生成
+        createHeart();
+      }
+    }, interval);
+  }
+
+  // 粒子特效
+  function createParticles(x, y) {
+    const particleCount = 8 + Math.floor(Math.random() * 6);
+    const particleColors = ['#fff', '#ffd700', '#ffecb3', '#ffe082']; // 暖冬白+金色系
+    
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      
+      // 随机大小
+      const size = 1 + Math.random() * 3;
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+      
+      // 随机颜色
+      const color = particleColors[Math.floor(Math.random() * particleColors.length)];
+      particle.style.setProperty('--particle-color', color);
+      
+      // 位置（确保在屏幕内）
+      const maxX = window.innerWidth - size;
+      const maxY = window.innerHeight - size;
+      const posX = Math.min(Math.max(x, size), maxX);
+      const posY = Math.min(Math.max(y, size), maxY);
+      particle.style.left = `${posX}px`;
+      particle.style.top = `${posY}px`;
+      
+      // 随机动画
+      const duration = 0.8 + Math.random() * 1.2;
+      const angle = (i / particleCount) * Math.PI * 2;
+      const distance = 15 + Math.random() * 15;
+      
+      particle.style.setProperty('--duration', `${duration}s`);
+      particle.style.transform = `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px)`;
+      
+      document.body.appendChild(particle);
+      
+      // 移除粒子
+      setTimeout(() => {
+        if (particle.parentNode) particle.remove();
+      }, duration * 1000);
+    }
+  }
+
+  // 坠落的爱心字体图标系统（限制在屏幕内）
+  function createFallingHeartIcon() {
+    const heartIcon = document.createElement('div');
+    heartIcon.className = 'falling-heart-icon';
+    
+    // 使用爱心符号作为字体图标
+    heartIcon.textContent = '❤';
+    
+    // 随机爱心颜色
+    const heartColors = [
+      '#FF3B8B', '#FF5CA1', '#FF7EB0', '#FF2E55', '#FF0066',
+      '#FF5588', '#FF3399', '#FF66CC', '#FF99CC', '#FF33CC',
+      '#FFD700', '#FFA500', '#FF6347', '#00CED1', '#9370DB'
+    ];
+    const color = heartColors[Math.floor(Math.random() * heartColors.length)];
+    
+    // 根据屏幕尺寸调整爱心大小
+    const isMobile = window.innerWidth < 768;
+    const size = isMobile ? 24 + Math.random() * 36 : 32 + Math.random() * 48;
+    const halfSize = size / 2; // 用于位置校准
+    
+    // 随机起始位置（确保完全在屏幕内）
+    const maxStartX = window.innerWidth - size;
+    const startX = Math.random() * maxStartX; // 0 ~ (屏幕宽 - 爱心宽)
+    const startY = -size - Math.random() * 100; // 从顶部外进入
+    
+    // 随机动画时长
+    const duration = isMobile ? 4 + Math.random() * 4 : 6 + Math.random() * 6;
+    
+    // 随机水平位移（限制范围，确保爱心始终在屏幕内）
+    const maxTx = isMobile ? 120 : 250;
+    const txMin = -startX + halfSize; // 左边界限制
+    const txMax = (window.innerWidth - size - startX) - halfSize; // 右边界限制
+    const tx = Math.min(Math.max((Math.random() - 0.5) * maxTx * 2, txMin), txMax);
+    
+    // 垂直位移（从底部离开屏幕）
+    const ty = window.innerHeight + size + 100;
+    
+    // 随机旋转角度
+    const rotation = (Math.random() - 0.5) * 180;
+    
+    // 随机缩放比例
+    const scale = 0.7 + Math.random() * 0.6;
+    
+    // 设置样式
+    heartIcon.style.setProperty('--size', `${size}px`);
+    heartIcon.style.setProperty('--color', color);
+    heartIcon.style.setProperty('--duration', `${duration}s`);
+    heartIcon.style.setProperty('--tx', `${tx}px`);
+    heartIcon.style.setProperty('--ty', `${ty}px`);
+    heartIcon.style.setProperty('--rotation', `${rotation}deg`);
+    heartIcon.style.setProperty('--scale', scale);
+    heartIcon.style.left = `${startX}px`;
+    heartIcon.style.top = `${startY}px`;
+    
+    document.body.appendChild(heartIcon);
+    
+    // 动画结束后移除并添加粒子效果
+    setTimeout(() => {
+      if (heartIcon.parentNode) {
+        const rect = heartIcon.getBoundingClientRect();
+        createParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+        heartIcon.remove();
+      }
+    }, duration * 1000);
+  }
+
+  // 启动坠落爱心图标
+  function startFallingHeartIcons() {
+    const isMobile = window.innerWidth < 768;
+    const intervalTime = isMobile ? 1200 : 900;
+    
+    setInterval(() => {
+      const probability = window.innerWidth < 768 ? 0.5 : 0.6;
+      if (Math.random() > (1 - probability)) {
+        createFallingHeartIcon();
+      }
+    }, intervalTime);
+  }
+
+  // 带相框的随机图片坠落系统（限制在屏幕内）
+  const imageUrls = [
+    "img/1.webp",
+    "img/2.webp",
+    "img/3.webp",
+    "img/4.webp",
+    "img/5.webp",
+    "img/6.webp",
+    "img/7.webp"
+  ];
+
+  function createFramedImage() {
+    // 创建外层容器
+    const container = document.createElement('div');
+    container.className = 'framed-image';
+    
+    // 创建相框元素
+    const frame = document.createElement('div');
+    frame.className = 'frame';
+    
+    // 创建装饰角的容器
+    const corners = document.createElement('span');
+    frame.appendChild(corners);
+    
+    // 创建图片元素
+    const img = document.createElement('img');
+    const randomImg = imageUrls[Math.floor(Math.random() * imageUrls.length)];
+    img.src = randomImg;
+    img.alt = "照片";
+    frame.appendChild(img);
+    
+    container.appendChild(frame);
+
+    // 根据屏幕尺寸调整图片大小
+    const isMobile = window.innerWidth < 768;
+    const size = isMobile ? 80 + Math.random() * 80 : 120 + Math.random() * 100; // 缩小最大尺寸，避免超出屏幕
+    const imgWidth = size;
+    const imgHeight = size * 1.2;
+    container.style.width = `${imgWidth}px`;
+    container.style.height = `${imgHeight}px`; // 保持一定的宽高比
+
+    // 随机起始位置（确保完全在屏幕内）
+    const maxStartX = window.innerWidth - imgWidth;
+    const maxStartY = -imgHeight - 50; // 从顶部外进入，不超出太多
+    const startX = Math.random() * maxStartX; // 0 ~ (屏幕宽 - 图片宽)
+    const startY = Math.random() * maxStartY - 50;
+    
+    // 随机动画时长（比爱心稍慢）
+    const duration = isMobile ? 7 + Math.random() * 6 : 9 + Math.random() * 8;
+    container.style.setProperty('--duration', `${duration}s`);
+
+    // 随机水平位移（限制范围，确保图片始终在屏幕内）
+    const maxTx = isMobile ? 150 : 250;
+    const txMin = -startX + 20; // 左边界限制（留20px余量）
+    const txMax = (window.innerWidth - imgWidth - startX) - 20; // 右边界限制
+    const tx = Math.min(Math.max((Math.random() - 0.5) * maxTx * 2, txMin), txMax);
+    container.style.setProperty('--tx', `${tx}px`);
+
+    // 垂直位移（从底部离开屏幕）
+    const ty = window.innerHeight + imgHeight + 50;
+    container.style.setProperty('--ty', `${ty}px`);
+
+    // 随机旋转角度（比爱心幅度小一些）
+    const rotation = (Math.random() - 0.5) * 45; // 减小旋转角度，避免超出屏幕
+    container.style.setProperty('--rotation', `${rotation}deg`);
+
+    // 随机缩放比例（限制最小缩放，避免过小）
+    const scale = 0.7 + Math.random() * 0.3;
+    container.style.setProperty('--scale', scale);
+
+    // 设置位置
+    container.style.left = `${startX}px`;
+    container.style.top = `${startY}px`;
+
+    document.body.appendChild(container);
+
+    // 动画结束后移除
+    setTimeout(() => {
+      if (container.parentNode) {
+        // 图片消失时添加粒子效果
+        const rect = container.getBoundingClientRect();
+        createParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+        container.remove();
+      }
+    }, duration * 1000);
+  }
+
+  // 启动带相框的图片坠落
+  function startFramedImages() {
+    const isMobile = window.innerWidth < 768;
+    // 图片出现频率低于爱心
+    const intervalTime = isMobile ? 3000 : 2500;
+    
+    setInterval(() => {
+      const probability = window.innerWidth < 768 ? 0.3 : 0.4; // 降低出现概率，避免屏幕拥挤
+      if (Math.random() > (1 - probability)) {
+        createFramedImage();
+      }
+    }, intervalTime);
+  }
+
+  // 触摸反馈效果
+  function createTouchFeedback(x, y) {
+    const feedback = document.createElement('div');
+    feedback.className = 'touch-feedback';
+    
+    // 确保反馈效果在屏幕内
+    const maxX = window.innerWidth - 30;
+    const maxY = window.innerHeight - 30;
+    const posX = Math.min(Math.max(x, 30), maxX);
+    const posY = Math.min(Math.max(y, 30), maxY);
+    
+    feedback.style.left = `${posX}px`;
+    feedback.style.top = `${posY}px`;
+    document.body.appendChild(feedback);
+    
+    // 创建触摸粒子
+    createParticles(posX, posY);
+    
+    setTimeout(() => {
+      if (feedback.parentNode) feedback.remove();
+    }, 600);
+  }
+
+  // 暖冬雪花特效 - 新增（限制在屏幕内）
+  function createSnowflake() {
+    const snowflake = document.createElement('div');
+    snowflake.className = 'snowflake';
+    // 雪花字符（多种样式）
+    const snowChars = ['❄️', '❅', '❆'];
+    snowflake.textContent = snowChars[Math.floor(Math.random() * snowChars.length)];
+    
+    const isMobile = window.innerWidth < 768;
+    const size = isMobile ? 12 + Math.random() * 12 : 16 + Math.random() * 16; // 缩小尺寸
+    const duration = isMobile ? 8 + Math.random() * 6 : 10 + Math.random() * 8;
+    
+    // 起始位置（确保在屏幕顶部内）
+    const maxStartX = window.innerWidth - size;
+    const startX = Math.random() * maxStartX;
+    const startY = -50;
+    
+    // 水平位移限制（确保雪花始终在屏幕内）
+    const maxTx = isMobile ? 60 : 100;
+    const txMin = -startX + 10;
+    const txMax = (window.innerWidth - size - startX) - 10;
+    const tx = Math.min(Math.max((Math.random() - 0.5) * maxTx * 2, txMin), txMax);
+    
+    const rotation = (Math.random() - 0.5) * 120;
+    const scale = 0.6 + Math.random() * 0.4;
+    
+    snowflake.style.setProperty('--size', `${size}px`);
+    snowflake.style.setProperty('--duration', `${duration}s`);
+    snowflake.style.setProperty('--tx', `${tx}px`);
+    snowflake.style.setProperty('--rotation', `${rotation}deg`);
+    snowflake.style.setProperty('--scale', scale);
+    snowflake.style.left = `${startX}px`;
+    snowflake.style.top = `${startY}px`;
+    
+    document.body.appendChild(snowflake);
+    
+    setTimeout(() => {
+      if (snowflake.parentNode) snowflake.remove();
+    }, duration * 1000);
+  }
+
+  // 启动雪花特效
+  function startSnowflakes() {
+    const isMobile = window.innerWidth < 768;
+    const interval = isMobile ? 1000 : 700; // 降低频率，避免拥挤
+    setInterval(() => {
+      if (Math.random() > 0.7) {
+        createSnowflake();
+      }
+    }, interval);
+  }
+
+  // 暖冬暖光特效 - 新增（限制在屏幕内）
+  function createWarmLight() {
+    const light = document.createElement('div');
+    light.className = 'warm-light';
+    
+    const isMobile = window.innerWidth < 768;
+    const size = isMobile ? 80 + Math.random() * 100 : 120 + Math.random() * 150; // 缩小尺寸
+    const halfSize = size / 2;
+    const duration = 3 + Math.random() * 2;
+    
+    // 位置（确保暖光中心在屏幕内，边缘不超出太多）
+    const maxX = window.innerWidth - halfSize;
+    const maxY = window.innerHeight - halfSize;
+    const x = halfSize + Math.random() * (maxX - halfSize);
+    const y = halfSize + Math.random() * (maxY - halfSize);
+    
+    light.style.setProperty('--size', `${size}px`);
+    light.style.setProperty('--duration', `${duration}s`);
+    light.style.left = `${x}px`;
+    light.style.top = `${y}px`;
+    light.style.transform = 'translate(-50%, -50%)';
+    
+    document.body.appendChild(light);
+    
+    setTimeout(() => {
+      if (light.parentNode) light.remove();
+    }, duration * 1000);
+  }
+
+  // 启动暖光特效
+  function startWarmLights() {
+    const interval = 3000; // 降低频率
+    setInterval(() => {
+      if (Math.random() > 0.8) { // 降低出现概率
+        createWarmLight();
+      }
+    }, interval);
+  }
+
+  // 暖冬结束粒子特效 - 新增
+  function createWinterParticles(x, y, count = 20) {
+    const colors = ['#ffd700', '#ffecb3', '#ffe082', '#fff', '#ffab40']; // 金色+白色系
+    for (let i = 0; i < count; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'winter-particle';
+      
+      const size = 2 + Math.random() * 4;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const duration = 1.5 + Math.random() * 1;
+      const angle = (i / count) * Math.PI * 2;
+      const distance = 20 + Math.random() * 30;
+      
+      // 确保粒子在屏幕内生成
+      const maxX = window.innerWidth - size;
+      const maxY = window.innerHeight - size;
+      const posX = Math.min(Math.max(x, size), maxX);
+      const posY = Math.min(Math.max(y, size), maxY);
+      
+      particle.style.setProperty('--color', color);
+      particle.style.setProperty('--duration', `${duration}s`);
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+      particle.style.left = `${posX}px`;
+      particle.style.top = `${posY}px`;
+      particle.style.transform = `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px)`;
+      
+      document.body.appendChild(particle);
+      
+      setTimeout(() => {
+        if (particle.parentNode) particle.remove();
+      }, duration * 1000);
+    }
+  }
+
+  // 生成爱心轨迹坐标（基于屏幕中心，确保轨迹在屏幕内）
+  function getHeartTracePoints(centerX, centerY) {
+    const isMobile = window.innerWidth < 768;
+    const scale = isMobile ? 0.5 : 0.8; // 进一步缩小轨迹范围，确保在屏幕内
+    const offsetX = isMobile ? 20 : 30; // 水平偏移校准
+    const offsetY = isMobile ? 10 : 20; // 垂直偏移校准
+    
+    return {
+      hx1: centerX - 30 * scale - offsetX, hy1: centerY - 25 * scale - offsetY,
+      hx2: centerX - 50 * scale - offsetX, hy2: centerY - 50 * scale - offsetY,
+      hx3: centerX - 35 * scale - offsetX, hy3: centerY - 75 * scale - offsetY,
+      hx4: centerX - offsetX, hy4: centerY - 85 * scale - offsetY,
+      hx5: centerX + 35 * scale - offsetX, hy5: centerY - 75 * scale - offsetY,
+      hx6: centerX + 50 * scale - offsetX, hy6: centerY - 50 * scale - offsetY,
+      hx7: centerX + 30 * scale - offsetX, hy7: centerY - 25 * scale - offsetY,
+      hx8: centerX + 15 * scale - offsetX, hy8: centerY - 8 * scale - offsetY,
+      hx9: centerX - offsetX, hy9: centerY - offsetY,
+      hx10: centerX - 15 * scale - offsetX, hy10: centerY - 8 * scale - offsetY
+    };
+  }
+
+  // 核心修改：暖冬结束特效（改为叠起+爱心轨迹移动）
+  function winterEndEffect() {
+    // 1. 停止所有正在生成的特效
+    active = false;
+    clearInterval(heartInterval);
+    clearInterval(heartIconInterval);
+    clearInterval(framedImageInterval);
+    clearInterval(snowflakeInterval);
+    clearInterval(warmLightInterval);
+    clearInterval(msgInterval);
+    
+    // 2. 显示结束提示文字（已向上移动）
+    const endHint = document.createElement('div');
+    endHint.className = 'winter-end-hint';
+    endHint.textContent = '你要每天都开心哦 ❤️';
+    document.body.appendChild(endHint);
+    
+    // 3. 信封聚合到屏幕中心（叠起效果）
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    const tracePoints = getHeartTracePoints(centerX, centerY);
+    
+    allMessageBoxes.forEach((box, index) => {
+      box.classList.add('gather');
+      // 分批聚合，形成叠层感
+      setTimeout(() => {
+        box.style.left = `${centerX}px`;
+        box.style.top = `${centerY}px`;
+        box.style.transform = `translate(-50%, -50%) scale(${0.9 - index * 0.05})`; // 层级缩放
+        box.style.zIndex = allMessageBoxes.length - index; // 后面的在上面
+      }, index * 80);
+    });
+    
+    // 4. 聚合完成后，依次启动爱心轨迹动画
+    setTimeout(() => {
+      allMessageBoxes.forEach((box, index) => {
+        // 逐个延迟启动，形成连续轨迹
+        setTimeout(() => {
+          // 设置爱心轨迹坐标
+          Object.entries(tracePoints).forEach(([key, value]) => {
+            box.style.setProperty(`--${key}`, `${value}px`);
+          });
+          // 移除原有动画，添加爱心轨迹类
+          box.classList.remove('show', 'gather', 'pulse', 'randomFade');
+          box.classList.add('heart-trace');
+          // 轨迹结束后生成粒子
+          setTimeout(() => {
+            const rect = box.getBoundingClientRect();
+            createWinterParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+            if (box.parentNode) box.remove();
+          }, 6000); // 与轨迹动画时长一致
+        }, index * 300); // 每个弹窗间隔300ms启动
+      });
+    }, 2000); // 等待聚合完成
+    
+    // 5. 中心生成大型粒子爆发
+    setTimeout(() => {
+      createWinterParticles(centerX, centerY, 50);
+    }, 3000);
+    
+    // 6. 雪花逐渐停止（最后一批雪花飘落）
+    setTimeout(() => {
+      document.querySelectorAll('.snowflake').forEach(snow => {
+        snow.style.animation = 'none';
+        snow.style.transition = 'opacity 2s ease-out';
+        snow.style.opacity = 0;
+        setTimeout(() => snow.remove(), 2000);
+      });
+    }, 4000);
+    
+    // 7. 暖光逐渐消散
+    setTimeout(() => {
+      document.querySelectorAll('.warm-light').forEach(light => {
+        light.style.animation = 'none';
+        light.style.transition = 'opacity 3s ease-out';
+        light.style.opacity = 0;
+        setTimeout(() => light.remove(), 3000);
+      });
+    }, 5000);
+  }
+
+  // 祝福弹窗系统 - 暖冬信封主题（限制在屏幕内）
+  const messages = [
+    "今天过得开心嘛", "保持微笑呀", "每天都要元气满满", "记得吃水果", "早点休息",
+    "好好爱自己", "梦想成真", "愿所有烦恼都消失", "天冷了，多穿衣服", "别熬夜",
+    "顺顺利利", "喝水哦~", "加油！", "一切都会好起来的", "你是最棒的！",
+    "世界因你而温柔", "慢慢来，别着急", "你值得被爱", "今天也很努力吧？", "星星会照亮你",
+    "我想你了","记得好好护肤","你超棒的","学会爱自己","保持好心情","冷，多穿衣服","期待下一次见面",
+    "珍惜每一刻","爱你哦","lucky","万事开头难","你能行的","我在","星河为你闪烁","美的冒泡",
+    "小心感冒","不难的","平平安安","无忧无虑","每天都喜欢你多一点"
+  ];
+
+  // 暖冬信封色彩配置（暖色系为主）
+  const messageThemes = [
+    { bg: '#ff9a8b', bgDark: '#ff6b5b', seal: '#d32f2f', glow: 'rgba(255,154,139,0.6)' },
+    { bg: '#ffb74d', bgDark: '#ffa726', seal: '#e65100', glow: 'rgba(255,183,77,0.6)' },
+    { bg: '#81c784', bgDark: '#4caf50', seal: '#2e7d32', glow: 'rgba(129,199,132,0.6)' },
+    { bg: '#64b5f6', bgDark: '#2196f3', seal: '#1565c0', glow: 'rgba(100,181,246,0.6)' },
+    { bg: '#ba68c8', bgDark: '#9c27b0', seal: '#7b1fa2', glow: 'rgba(186,104,200,0.6)' },
+    { bg: '#ffccbc', bgDark: '#ffab91', seal: '#ef6c00', glow: 'rgba(255,204,188,0.6)' },
+    { bg: '#b39ddb', bgDark: '#9575cd', seal: '#673ab7', glow: 'rgba(179,157,219,0.6)' },
+    { bg: '#80deea', bgDark: '#26c6da', seal: '#00897b', glow: 'rgba(128,222,234,0.6)' }
+  ];
+
+  let active = true;
+  let msgInterval, heartInterval, heartIconInterval, framedImageInterval, snowflakeInterval, warmLightInterval;
+
+  // 弹窗创建（修改为随机位置+随机淡化，严格限制在屏幕内）
+  function createMessage() {
+    if (!active) return;
+    const msg = messages[Math.floor(Math.random() * messages.length)];
+    const theme = messageThemes[Math.floor(Math.random() * messageThemes.length)];
+    const box = document.createElement('div');
+    box.className = 'message-box';
+    box.textContent = msg;
+    
+    // 设置信封主题样式
+    box.style.setProperty('--bg-color', theme.bg);
+    box.style.setProperty('--bg-color-dark', theme.bgDark);
+    box.style.setProperty('--glow-color', theme.glow);
+
+    // 核心修改：严格限制弹窗在屏幕内
+    const isMobile = window.innerWidth < 768;
+    const margin = isMobile ? 20 : 30; // 边界余量
+    // 计算弹窗最大可能宽度（基于内容和屏幕宽度）
+    const maxBoxWidth = window.innerWidth * 0.6; // 最大宽度不超过屏幕60%
+    box.style.maxWidth = `${maxBoxWidth}px`;
+    
+    // 预计算弹窗宽高（确保位置计算准确）
+    document.body.appendChild(box); // 临时添加到DOM以获取尺寸
+    const boxWidth = box.offsetWidth;
+    const boxHeight = box.offsetHeight;
+    box.remove(); // 先移除，后续重新添加
+    
+    // 计算可用位置范围（确保弹窗完全在屏幕内）
+    const maxX = window.innerWidth - boxWidth - margin * 2;
+    const maxY = window.innerHeight - boxHeight - margin * 2;
+    const minX = margin;
+    const minY = margin;
+    
+    // 真正随机的位置计算（严格限制在范围内）
+    const x = minX + Math.random() * (maxX - minX);
+    const y = minY + Math.random() * (maxY - minY);
+    
+    box.style.left = `${x}px`;
+    box.style.top = `${y}px`;
+
+    // 点击单个消息可移除
+    box.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // 移除时添加粒子效果
+      const rect = box.getBoundingClientRect();
+      createParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+      removeMessage(box);
+      // 从数组中移除
+      allMessageBoxes = allMessageBoxes.filter(item => item !== box);
+    });
+
+    document.body.appendChild(box);
+    // 随机延迟显示（增强随机感）
+    const randomDelay = Math.random() * 800;
+    setTimeout(() => box.classList.add('show'), randomDelay);
+
+    // 添加到弹窗数组
+    allMessageBoxes.push(box);
+
+    // 自动消失（保留原有逻辑）
+    const lifetime = isMobile ? 3000 + Math.random() * 2000 : 4000 + Math.random() * 3000;
+    setTimeout(() => {
+      if (box.parentNode) {
+        createParticles(box.offsetLeft + boxWidth/2, box.offsetTop + boxHeight/2);
+        removeMessage(box);
+        allMessageBoxes = allMessageBoxes.filter(item => item !== box);
+      }
+    }, lifetime);
+  }
+
+  // 移除消息框的动画
+  function removeMessage(box) {
+    box.classList.remove('show');
+    box.classList.add('fade-out');
+    setTimeout(() => box.remove(), 300);
+  }
+
+  // 启动系统
+  window.addEventListener('load', () => {
+    createStars();
+    // 启动各类特效
+    heartInterval = setInterval(() => {
+      if (Math.random() > 0.7) createHeart();
+    }, window.innerWidth < 768 ? 600 : 400);
+    
+    heartIconInterval = setInterval(() => {
+      const probability = window.innerWidth < 768 ? 0.4 : 0.5;
+      if (Math.random() > (1 - probability)) createFallingHeartIcon();
+    }, window.innerWidth < 768 ? 1500 : 1200);
+    
+    framedImageInterval = setInterval(() => {
+      const probability = window.innerWidth < 768 ? 0.3 : 0.4;
+      if (Math.random() > (1 - probability)) createFramedImage();
+    }, window.innerWidth < 768 ? 3500 : 3000);
+    
+    snowflakeInterval = setInterval(() => {
+      if (Math.random() > 0.75) createSnowflake();
+    }, window.innerWidth < 768 ? 1200 : 800);
+    
+    warmLightInterval = setInterval(() => {
+      if (Math.random() > 0.85) createWarmLight();
+    }, 3000);
+
+    // 弹窗频率控制
+    const isMobile = window.innerWidth < 768;
+    let msgIntervalTime = isMobile ? 1200 : 1000; // 降低弹窗生成频率，避免拥挤
+    startTime = Date.now();
+    
+    // 初始弹窗生成（减少数量）
+    const initialCount = isMobile ? 3 : 5;
+    for (let i = 0; i < initialCount; i++) {
+      setTimeout(createMessage, i * 200);
+    }
+    
+    // 持续生成弹窗
+    msgInterval = setInterval(() => {
+      if (!active) return;
+      
+      const count = Math.max(1, Math.floor((isMobile ? 1 : 2) - (30000 - (Date.now() - startTime)) / 15000));
+      
+      for (let i = 0; i < count; i++) {
+        setTimeout(createMessage, i * 50);
+      }
+      
+      msgIntervalTime = Math.min(isMobile ? 2000 : 1800, msgIntervalTime + (isMobile ? 5 : 7));
+      clearInterval(msgInterval);
+      msgInterval = setInterval(() => {
+        if (!active) return;
+        const count = Math.max(1, Math.floor((isMobile ? 1 : 2) - (30000 - (Date.now() - startTime)) / 15000));
+        for (let i = 0; i < count; i++) {
+          setTimeout(createMessage, i * 50);
+        }
+      }, msgIntervalTime);
+    }, msgIntervalTime);
+    
+    // 30秒后触发暖冬结束特效（叠起+爱心轨迹）
+    setTimeout(() => {
+      winterEndEffect();
+    }, 30000);
+  });
+
+  // 点击/触摸清空所有弹窗
+  function handleClearMessages(e) {
+    createTouchFeedback(e.clientX || e.touches[0].clientX, e.clientY || e.touches[0].clientY);
+    
+    document.querySelectorAll('.message-box').forEach(el => {
+      createParticles(el.offsetLeft + el.offsetWidth/2, el.offsetTop + el.offsetHeight/2);
+      el.classList.remove('show');
+      el.classList.add('fade-out');
+      setTimeout(() => el.remove(), 300);
+      allMessageBoxes = allMessageBoxes.filter(item => item !== el);
+    });
+  }
+
+  document.addEventListener('click', handleClearMessages);
+  document.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    handleClearMessages(e);
+  }, { passive: false });
+
+  // 窗口大小变化时重新调整（确保元素始终在屏幕内）
+  window.addEventListener('resize', () => {
+    // 重新创建星星
+    document.querySelectorAll('.star').forEach(star => star.remove());
+    createStars();
+    
+    // 调整现有弹窗位置（确保仍在屏幕内）
+    const isMobile = window.innerWidth < 768;
+    const margin = isMobile ? 20 : 30;
+    
+    document.querySelectorAll('.message-box').forEach(box => {
+      if (!box.classList.contains('gather') && !box.classList.contains('heart-trace')) {
+        const boxWidth = box.offsetWidth;
+        const boxHeight = box.offsetHeight;
+        const maxX = window.innerWidth - boxWidth - margin * 2;
+        const maxY = window.innerHeight - boxHeight - margin * 2;
+        const currentX = parseFloat(box.style.left);
+        const currentY = parseFloat(box.style.top);
+        
+        // 修正位置（如果超出边界）
+        const newX = Math.min(Math.max(currentX, margin), maxX);
+        const newY = Math.min(Math.max(currentY, margin), maxY);
+        
+        box.style.left = `${newX}px`;
+        box.style.top = `${newY}px`;
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

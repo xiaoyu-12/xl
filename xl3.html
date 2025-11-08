@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小纸条</title>
+    <style>
+        /* 页面基础样式 - 粉色系主题 */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: linear-gradient(135deg, #fff5f8 0%, #ffe6f2 30%, #ffd9e8 100%); /* 渐变粉背景 */
+            background-image: radial-gradient(circle at 30% 20%, rgba(255, 220, 240, 0.8) 0%, transparent 30%),
+                              radial-gradient(circle at 70% 80%, rgba(255, 200, 230, 0.7) 0%, transparent 30%);
+            font-family: "Comic Sans MS", "微软雅黑", sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 下雪特效容器 */
+        .snow-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1; /* 雪花在纸条下方 */
+            pointer-events: none; /* 不影响交互 */
+        }
+
+        /* 雪花样式 - 适配粉色背景（轻微粉色调） */
+        .snowflake {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.9); /* 半透明白色，带轻微粉色感 */
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: fall linear infinite;
+            box-shadow: 0 0 2px rgba(255, 230, 240, 0.5); /* 粉色微光，契合主题 */
+        }
+
+        /* 雪花下落动画 - 更轻柔，适配粉色浪漫氛围 */
+        @keyframes fall {
+            0% {
+                transform: translateY(-10px) rotate(0deg) scale(0.9);
+                opacity: 0;
+            }
+            15% {
+                opacity: 0.9;
+            }
+            85% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(calc(100vh + 10px)) rotate(360deg) scale(1.1);
+                opacity: 0;
+            }
+        }
+
+        /* 小纸条样式 - 粉色系适配 */
+        .note {
+            position: absolute;
+            padding: 6px 10px 10px; /* 上小下大 */
+            background-color: rgba(255, 255, 255, 0.95); /* 白底更清新，适配粉色背景 */
+            border: 1px solid #ffc1e9; /* 粉色边框 */
+            border-radius: 6px;
+            box-shadow: 0 3px 10px rgba(255, 179, 217, 0.2); /* 粉色阴影，柔和不突兀 */
+            transform: rotate(var(--rotate, -3deg));
+            z-index: 10; /* 纸条在雪花上方 */
+            width: 110px;
+            text-align: left;
+            transition: all 1.8s cubic-bezier(0.22, 1, 0.36, 1);
+            opacity: 1;
+        }
+
+        /* 顶部区域：小粉色爱心靠左+黑色信字 */
+        .note-header {
+            display: flex;
+            align-items: center;
+            gap: 5px; /* 爱心和信字间距 */
+            margin-bottom: 4px;
+            padding-left: 2px;
+        }
+
+        .heart-icon {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: #ff4d94; /* 深粉爱心，契合粉色主题 */
+            transform: rotate(45deg);
+            position: relative;
+            box-shadow: 0 0 3px rgba(255, 77, 148, 0.6); /* 爱心微光，更醒目 */
+        }
+
+        .heart-icon::before,
+        .heart-icon::after {
+            content: "";
+            width: 10px;
+            height: 10px;
+            background-color: #ff4d94;
+            border-radius: 50%;
+            position: absolute;
+            box-shadow: 0 0 3px rgba(255, 77, 148, 0.6);
+        }
+
+        .heart-icon::before {
+            top: -5px;
+            left: 0;
+        }
+
+        .heart-icon::after {
+            top: 0;
+            left: -5px;
+        }
+
+        .letter-text {
+            color: #333; /* 黑色信字，与粉色背景形成清晰对比 */
+            font-size: 10px;
+            font-weight: 600;
+            text-shadow: 0 1px 1px rgba(255, 230, 240, 0.5); /* 粉色微光，契合主题 */
+        }
+
+        /* 祝福文字样式 - 粉色系适配，可读性强 */
+        .note-text {
+            color: #2d2d2d; /* 深灰黑色，避免过亮刺眼 */
+            font-size: 13px;
+            line-height: 1.5;
+            margin: 0;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-shadow: 0 1px 1px rgba(255, 220, 240, 0.3);
+        }
+
+        /* 关闭按钮样式 - 粉色系隐蔽化 */
+        .close-btn {
+            position: absolute;
+            top: 2px;
+            right: 4px;
+            background: none;
+            border: none;
+            color: #d9b3c6; /* 粉色系灰色，不破坏主题 */
+            font-size: 11px;
+            cursor: pointer;
+            padding: 1px;
+            line-height: 1;
+            opacity: 0.4;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            color: #ff99cc; /* hover时粉色加深，契合主题 */
+            opacity: 0.8;
+        }
+
+        /* 小纸条颜色变体 - 粉色系延伸，更协调 */
+        .note.pink {
+            background-color: rgba(255, 240, 248, 0.95);
+            border-color: #ffb3d9;
+            box-shadow: 0 3px 10px rgba(255, 179, 217, 0.3);
+        }
+
+        .note.blue {
+            background-color: rgba(255, 245, 250, 0.95); /* 淡蓝带粉，适配主题 */
+            border-color: #ffc1e9;
+            box-shadow: 0 3px 10px rgba(255, 193, 233, 0.2);
+        }
+
+        .note.green {
+            background-color: rgba(250, 255, 252, 0.95); /* 淡绿带粉，适配主题 */
+            border-color: #ffcce0;
+            box-shadow: 0 3px 10px rgba(255, 204, 224, 0.2);
+        }
+
+        /* 所有颜色纸条统一深粉爱心，强化粉色主题 */
+        .note.pink .heart-icon,
+        .note.pink .heart-icon::before,
+        .note.pink .heart-icon::after {
+            background-color: #ff3385;
+        }
+
+        .note.blue .heart-icon,
+        .note.blue .heart-icon::before,
+        .note.blue .heart-icon::after {
+            background-color: #ff4d94;
+        }
+
+        .note.green .heart-icon,
+        .note.green .heart-icon::before,
+        .note.green .heart-icon::after {
+            background-color: #ff4d94;
+        }
+    </style>
+</head>
+<body>
+    <!-- 下雪特效容器 -->
+    <div class="snow-container" id="snowContainer"></div>
+
+    <script>
+        // 100条祝福语句（每条≤5字，保留全部美好寓意）
+        const blessings = [
+            "平安喜乐", "万事顺意", "健康常伴", "暴富暴美", "好运爆棚",
+            "升职加薪", "逢考必过", "笑容灿烂", "旅途顺遂", "被爱包围",
+            "烦恼清零", "贵人相助", "钱包鼓鼓", "颜值在线", "心态平和",
+            "所求皆得", "日子有甜", "友情长久", "事业有成", "岁岁欢愉",
+            "身体倍棒", "喜事不断", "温柔以待", "财源广进", "逢凶化吉",
+            "家庭和睦", "前程似锦", "心情愉悦", "福寿绵长", "眼中有光",
+            "事事顺心", "爱情甜蜜", "生活舒心", "美好如期", "快乐无忧",
+            "蒸蒸日上", "金榜题名", "好运围绕", "人生圆满", "四季安康",
+            "阳光满面", "富贵吉祥", "收入丰厚", "所行坦途", "平安长寿",
+            "爱情美满", "未来可期", "心想事成", "幸福相守", "惊喜不断",
+            "笑口常开", "福禄双全", "财运亨通", "五谷丰登", "吉祥如意",
+            "步步高升", "龙马精神", "一帆风顺", "金玉满堂", "喜气洋洋",
+            "安居乐业", "欣欣向荣", "国泰民安", "阖家幸福", "白头偕老",
+            "早生贵子", "德高望重", "才思敏捷", "出类拔萃", "博学多才",
+            "神采奕奕", "容光焕发", "活力四射", "青春永驻", "福星高照",
+            "紫气东来", "祥云瑞气", "招财进宝", "心想事成", "美梦成真",
+            "旗开得胜", "马到成功", "鹏程万里", "大展宏图", "飞黄腾达",
+            "蒸蒸日上", "欣欣向荣", "安居乐业", "国泰民安", "阖家欢乐",
+            "福寿安康", "吉祥如意", "万事亨通", "财源滚滚", "好运连连",
+            "喜气临门", "福禄寿喜", "荣华富贵", "金玉良缘", "天作之合",
+            "珠联璧合", "佳偶天成", "百年好合", "永结同心", "幸福美满"
+        ];
+
+        // 小纸条颜色类
+        const noteColors = ["", "pink", "blue", "green"];
+        const allNotes = [];
+        let centerX = window.innerWidth / 2;
+        let centerY = window.innerHeight / 2;
+        let heartRadius = Math.min(window.innerWidth, window.innerHeight) / 2.2;
+        const centerClearRadius = 80; // 中心清除区域半径
+
+        // ---------------------- 下雪特效逻辑（适配粉色主题） ----------------------
+        function createSnowflake() {
+            const snowContainer = document.getElementById("snowContainer");
+            const snowflake = document.createElement("div");
+            snowflake.className = "snowflake";
+
+            // 随机雪花大小（1-4px），更小巧柔和
+            const size = Math.random() * 3 + 1;
+            snowflake.style.width = `${size}px`;
+            snowflake.style.height = `${size}px`;
+
+            // 随机水平位置
+            const startX = Math.random() * window.innerWidth;
+            snowflake.style.left = `${startX}px`;
+
+            // 随机下落动画时长（8-20秒，更缓慢，契合粉色浪漫氛围）
+            const duration = Math.random() * 12 + 8;
+            snowflake.style.animationDuration = `${duration}s`;
+
+            // 随机延迟（0-8秒）
+            const delay = Math.random() * 8;
+            snowflake.style.animationDelay = `${delay}s`;
+
+            // 随机透明度（0.6-0.9），更通透
+            snowflake.style.opacity = Math.random() * 0.3 + 0.6;
+
+            // 添加到容器
+            snowContainer.appendChild(snowflake);
+
+            // 动画结束后移除，避免内存占用
+            setTimeout(() => {
+                snowflake.remove();
+            }, (duration + delay) * 1000);
+        }
+
+        // 持续生成雪花（每150ms生成一个，密度适中，不遮挡内容）
+        function startSnowing() {
+            setInterval(createSnowflake, 150);
+        }
+
+        // ---------------------- 纸条核心逻辑 ----------------------
+        // 优化心形方程（100张纸条分布均匀）
+        function getHeartPosition(index, total) {
+            const t = (index / total) * Math.PI * 2;
+            const x = 22 * Math.pow(Math.sin(t), 3);
+            const y = 16 * Math.cos(t) - 7 * Math.cos(2*t) - 3 * Math.cos(3*t) - 1.2 * Math.cos(4*t);
+            const scale = heartRadius / 22;
+            const posX = centerX + x * scale;
+            const posY = centerY - y * scale;
+            return { x: posX - 55, y: posY - 35 }; // 适配110px宽纸条
+        }
+
+        // 生成随机位置（避开中心）
+        function getRandomPosition() {
+            const maxX = window.innerWidth - 130;
+            const maxY = window.innerHeight - 90;
+            let x, y;
+            // 确保不在中心区域
+            do {
+                x = Math.floor(Math.random() * (maxX + 30)) - 15;
+                y = Math.floor(Math.random() * (maxY + 30)) - 15;
+            } while (isInCenterArea(x + 55, y + 35));
+            return { x, y };
+        }
+
+        // 随机旋转角度（-15°~15°）
+        function getRandomRotate() {
+            return (Math.random() * 30 - 15) + "deg";
+        }
+
+        // 判断是否在中心区域
+        function isInCenterArea(x, y) {
+            const dx = x - centerX;
+            const dy = y - centerY;
+            const distance = Math.sqrt(dx*dx + dy*dy);
+            return distance < centerClearRadius;
+        }
+
+        // 创建100张小纸条
+        function createNote(index, total) {
+            const randomBlessing = blessings[Math.floor(Math.random() * blessings.length)];
+            const randomColor = noteColors[Math.floor(Math.random() * noteColors.length)];
+            const rotate = getRandomRotate();
+
+            // 初始层叠在中心
+            const initPos = { x: centerX - 55, y: centerY - 35 };
+
+            const note = document.createElement("div");
+            note.className = `note ${randomColor}`;
+            note.style.left = `${initPos.x}px`;
+            note.style.top = `${initPos.y}px`;
+            note.style.setProperty("--rotate", rotate);
+
+            // 纸条结构
+            note.innerHTML = `
+                <div class="note-header">
+                    <span class="heart-icon"></span>
+                    <span class="letter-text">信</span>
+                </div>
+                <p class="note-text">${randomBlessing}</p>
+                <button class="close-btn">×</button>
+            `;
+
+            // 关闭按钮事件
+            const closeBtn = note.querySelector(".close-btn");
+            closeBtn.addEventListener("click", () => {
+                note.style.opacity = 0;
+                setTimeout(() => note.remove(), 300);
+            });
+
+            document.body.appendChild(note);
+            allNotes.push({ dom: note, index, total });
+
+            // 自动移除时间80秒
+            setTimeout(() => {
+                note.style.opacity = 0;
+                setTimeout(() => note.remove(), 300);
+            }, 80000);
+        }
+
+        // 阶段1：形成爱心
+        function animateToHeart() {
+            allNotes.forEach((item, idx) => {
+                const { dom, index, total } = item;
+                const heartPos = getHeartPosition(index, total);
+                // 延迟调整为20ms，100张纸条形成更流畅
+                setTimeout(() => {
+                    dom.style.left = `${heartPos.x}px`;
+                    dom.style.top = `${heartPos.y}px`;
+                    dom.style.setProperty("--rotate", getRandomRotate());
+                }, idx * 20);
+            });
+        }
+
+        // 阶段2：一次性分散（100张纸条震撼感更强）
+        function animateToRandom() {
+            setTimeout(() => {
+                const notesToRemove = [];
+                
+                allNotes.forEach((item, idx) => {
+                    const { dom } = item;
+                    const randomPos = getRandomPosition();
+                    const randomRotate = getRandomRotate();
+                    
+                    dom.style.left = `${randomPos.x}px`;
+                    dom.style.top = `${randomPos.y}px`;
+                    dom.style.setProperty("--rotate", randomRotate);
+                    
+                    if (isInCenterArea(randomPos.x + 55, randomPos.y + 35)) {
+                        notesToRemove.push(idx);
+                    }
+                });
+
+                // 清除中心纸条
+                setTimeout(() => {
+                    notesToRemove.forEach(idx => {
+                        const note = allNotes[idx].dom;
+                        note.style.opacity = 0;
+                        setTimeout(() => note.remove(), 300);
+                    });
+                    for (let i = notesToRemove.length - 1; i >= 0; i--) {
+                        allNotes.splice(notesToRemove[i], 1);
+                    }
+                }, 1500);
+
+            }, 7000); // 爱心保持7秒，100张纸条更易看清
+        }
+
+        // 初始化流程
+        function init() {
+            // 清空旧元素
+            allNotes.forEach(item => item.dom.remove());
+            allNotes.length = 0;
+            document.getElementById("snowContainer").innerHTML = "";
+            
+            const totalNotes = blessings.length; // 100张纸条
+            for (let i = 0; i < totalNotes; i++) {
+                createNote(i, totalNotes);
+            }
+
+            // 启动下雪（适配粉色主题的轻柔雪花）
+            startSnowing();
+
+            // 1秒后形成爱心
+            setTimeout(animateToHeart, 1000);
+            // 爱心形成后分散
+            animateToRandom();
+        }
+
+        // 页面加载初始化
+        window.addEventListener("load", init);
+
+        // 窗口resize适配
+        window.addEventListener("resize", () => {
+            centerX = window.innerWidth / 2;
+            centerY = window.innerHeight / 2;
+            heartRadius = Math.min(window.innerWidth, window.innerHeight) / 2.2;
+            init();
+        });
+    </script>
+</body>
+</html>
