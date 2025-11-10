@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深空星空可拖动祝福笺</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 页面基础样式 - 深空星空背景 */
+        body {
+            height: 100vh;
+            background: radial-gradient(ellipse at top, #1a2a6c, #000000 80%);
+            font-family: "Comic Sans MS", "微软雅黑", sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 星空容器 - 层级最低，不干扰交互 */
+        .stars-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* 星星样式 - 不同亮度和大小，模拟真实星空 */
+        .star {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: twinkle infinite alternate;
+        }
+
+        /* 星星闪烁动画 - 不同频率和亮度变化 */
+        @keyframes twinkle {
+            0% {
+                opacity: 0.3;
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+        }
+
+        /* 小纸条样式 - 保持原设计，适配星空背景优化亮度 */
+        .note {
+            position: absolute;
+            padding: 4px 8px 8px;
+            background-color: rgba(255, 255, 255, 0.98); /* 提高亮度，适配深色背景 */
+            border: 1px solid #ff85c0; /* 调整边框颜色，更搭星空 */
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(255, 133, 192, 0.3);
+            transform: rotate(var(--rotate, -3deg));
+            z-index: 10;
+            width: 80px;
+            text-align: left;
+            transition: all 1.8s cubic-bezier(0.22, 1, 0.36, 1);
+            opacity: 1;
+            cursor: move;
+            user-select: none;
+        }
+
+        /* 纸条顶部爱心+文字 - 适配深色背景优化颜色 */
+        .note-header {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 3px;
+            padding-left: 1px;
+        }
+
+        .heart-icon {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #ff4d94;
+            transform: rotate(45deg);
+            position: relative;
+            box-shadow: 0 0 3px rgba(255, 77, 148, 0.8); /* 增强阴影，更醒目 */
+        }
+
+        .heart-icon::before,
+        .heart-icon::after {
+            content: "";
+            width: 8px;
+            height: 8px;
+            background-color: #ff4d94;
+            border-radius: 50%;
+            position: absolute;
+            box-shadow: 0 0 3px rgba(255, 77, 148, 0.8);
+        }
+
+        .heart-icon::before {
+            top: -4px;
+            left: 0;
+        }
+
+        .heart-icon::after {
+            top: 0;
+            left: -4px;
+        }
+
+        .letter-text {
+            color: #ff3385; /* 调整文字颜色，更搭星空 */
+            font-size: 8px;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+        }
+
+        /* 祝福文字 - 加深颜色，提高对比度 */
+        .note-text {
+            color: #222;
+            font-size: 11px;
+            line-height: 1.4;
+            margin: 0;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
+        }
+
+        /* 关闭按钮 - 优化颜色，适配深色背景 */
+        .close-btn {
+            position: absolute;
+            top: 1px;
+            right: 3px;
+            background: none;
+            border: none;
+            color: #ff85c0;
+            font-size: 10px;
+            cursor: pointer;
+            padding: 1px;
+            line-height: 1;
+            opacity: 0.6;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            color: #ff4d94;
+            opacity: 1;
+        }
+
+        /* 纸条颜色变体 - 适配深色背景调整色调 */
+        .note.pink {
+            background-color: rgba(255, 240, 248, 0.98);
+            border-color: #ff85c0;
+            box-shadow: 0 2px 10px rgba(255, 133, 192, 0.4);
+        }
+
+        .note.blue {
+            background-color: rgba(240, 248, 255, 0.98);
+            border-color: #85cfff;
+            box-shadow: 0 2px 10px rgba(133, 207, 255, 0.4);
+        }
+
+        .note.green {
+            background-color: rgba(240, 255, 248, 0.98);
+            border-color: #85ffd6;
+            box-shadow: 0 2px 10px rgba(133, 255, 214, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="stars-container" id="starsContainer"></div>
+
+    <script>
+        // 祝福语句库
+        const blessings = [
+            "平安喜乐", "万事顺意", "健康常伴", "暴富暴美", "好运爆棚",
+            "升职加薪", "逢考必过", "笑容灿烂", "旅途顺遂", "被爱包围",
+            "烦恼清零", "贵人相助", "钱包鼓鼓", "颜值在线", "心态平和",
+            "所求皆得", "日子有甜", "友情长久", "事业有成", "岁岁欢愉",
+            "身体倍棒", "喜事不断", "温柔以待", "财源广进", "逢凶化吉",
+            "家庭和睦", "前程似锦", "心情愉悦", "福寿绵长", "眼中有光",
+            "事事顺心", "爱情甜蜜", "生活舒心", "美好如期", "快乐无忧",
+            "蒸蒸日上", "金榜题名", "好运围绕", "人生圆满", "四季安康",
+            "阳光满面", "富贵吉祥", "收入丰厚", "所行坦途", "平安长寿",
+            "爱情美满", "未来可期", "心想事成", "幸福相守", "惊喜不断",
+            "笑口常开", "福禄双全", "财运亨通", "五谷丰登", "吉祥如意",
+            "步步高升", "龙马精神", "一帆风顺", "金玉满堂", "喜气洋洋",
+            "安居乐业", "欣欣向荣", "国泰民安", "阖家幸福", "白头偕老",
+            "早生贵子", "德高望重", "才思敏捷", "出类拔萃", "博学多才",
+            "神采奕奕", "容光焕发", "活力四射", "青春永驻", "福星高照",
+            "紫气东来", "祥云瑞气", "招财进宝", "心想事成", "美梦成真",
+            "旗开得胜", "马到成功", "鹏程万里", "大展宏图", "飞黄腾达",
+            "蒸蒸日上", "欣欣向荣", "安居乐业", "国泰民安", "阖家欢乐",
+            "福寿安康", "吉祥如意", "万事亨通", "财源滚滚", "好运连连",
+            "喜气临门", "福禄寿喜", "荣华富贵", "金玉良缘", "天作之合",
+            "珠联璧合", "佳偶天成", "百年好合", "永结同心", "幸福美满"
+        ];
+
+        const noteColors = ["", "pink", "blue", "green"];
+        const allNotes = [];
+        let centerX = window.innerWidth / 2;
+        let centerY = window.innerHeight / 2;
+        let heartRadius = Math.min(window.innerWidth, window.innerHeight) / 2.2;
+        const noteWidth = 80;
+        const noteHeight = 40;
+        const minDistance = 60;
+        let maxZIndex = 10;
+        const totalStars = 300; // 星星总数，可调整密度
+
+        // ---------------------- 星空特效（核心功能） ----------------------
+        function createStar() {
+            const starsContainer = document.getElementById("starsContainer");
+            const star = document.createElement("div");
+            star.className = "star";
+
+            // 随机星星大小（1-3px）
+            const size = Math.random() * 2 + 1;
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+
+            // 随机位置（全屏分布）
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+            star.style.left = `${x}%`;
+            star.style.top = `${y}%`;
+
+            // 随机亮度（白色、淡蓝、淡紫，模拟深空星星）
+            const colors = ["rgba(255,255,255,0.9)", "rgba(180,200,255,0.8)", "rgba(220,180,255,0.7)"];
+            star.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+            // 随机闪烁频率（2-8秒）
+            const duration = Math.random() * 6 + 2;
+            star.style.animationDuration = `${duration}s`;
+
+            // 随机初始延迟（0-5秒），避免同步闪烁
+            const delay = Math.random() * 5;
+            star.style.animationDelay = `${delay}s`;
+
+            starsContainer.appendChild(star);
+        }
+
+        // 生成所有星星
+        function initStars() {
+            for (let i = 0; i < totalStars; i++) {
+                createStar();
+            }
+        }
+
+        // ---------------------- 拖动功能（实时跟随，无延迟） ----------------------
+        function makeNoteDraggable(noteDom) {
+            let isDragging = false;
+            let offsetX, offsetY;
+
+            // 鼠标按下：记录偏移量+置顶
+            noteDom.addEventListener("mousedown", (e) => {
+                if (e.target.classList.contains("close-btn")) return;
+                isDragging = true;
+                const rect = noteDom.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+
+                // 拖动时置顶+增强阴影
+                maxZIndex++;
+                noteDom.style.zIndex = maxZIndex;
+                noteDom.style.cursor = "grabbing";
+                noteDom.style.boxShadow = "0 4px 15px rgba(255, 133, 192, 0.6)";
+                noteDom.style.transition = "none";
+            });
+
+            // 鼠标移动：实时更新位置
+            document.addEventListener("mousemove", (e) => {
+                if (!isDragging) return;
+
+                let newX = e.clientX - offsetX;
+                let newY = e.clientY - offsetY;
+
+                // 边界限制
+                newX = Math.max(0, Math.min(newX, window.innerWidth - noteWidth));
+                newY = Math.max(0, Math.min(newY, window.innerHeight - noteHeight));
+
+                noteDom.style.left = `${newX}px`;
+                noteDom.style.top = `${newY}px`;
+            });
+
+            // 鼠标松开：恢复状态
+            document.addEventListener("mouseup", () => {
+                if (isDragging) {
+                    isDragging = false;
+                    noteDom.style.cursor = "move";
+                    noteDom.style.boxShadow = "0 2px 10px rgba(255, 133, 192, 0.3)";
+                    noteDom.style.transition = "all 1.8s cubic-bezier(0.22, 1, 0.36, 1)";
+                }
+            });
+
+            // 触摸设备支持
+            noteDom.addEventListener("touchstart", (e) => {
+                const touch = e.touches[0];
+                const rect = noteDom.getBoundingClientRect();
+                offsetX = touch.clientX - rect.left;
+                offsetY = touch.clientY - rect.top;
+                isDragging = true;
+                maxZIndex++;
+                noteDom.style.zIndex = maxZIndex;
+                noteDom.style.boxShadow = "0 4px 15px rgba(255, 133, 192, 0.6)";
+                noteDom.style.transition = "none";
+            });
+
+            document.addEventListener("touchmove", (e) => {
+                if (!isDragging) return;
+                const touch = e.touches[0];
+                let newX = touch.clientX - offsetX;
+                let newY = touch.clientY - offsetY;
+
+                newX = Math.max(0, Math.min(newX, window.innerWidth - noteWidth));
+                newY = Math.max(0, Math.min(newY, window.innerHeight - noteHeight));
+
+                noteDom.style.left = `${newX}px`;
+                noteDom.style.top = `${newY}px`;
+            });
+
+            document.addEventListener("touchend", () => {
+                isDragging = false;
+                noteDom.style.boxShadow = "0 2px 10px rgba(255, 133, 192, 0.3)";
+                noteDom.style.transition = "all 1.8s cubic-bezier(0.22, 1, 0.36, 1)";
+            });
+        }
+
+        // ---------------------- 纸条核心逻辑 ----------------------
+        function getHeartPosition(index, total) {
+            const t = (index / total) * Math.PI * 2;
+            const x = 22 * Math.pow(Math.sin(t), 3);
+            const y = 16 * Math.cos(t) - 7 * Math.cos(2*t) - 3 * Math.cos(3*t) - 1.2 * Math.cos(4*t);
+            const scale = heartRadius / 22;
+            const posX = centerX + x * scale;
+            const posY = centerY - y * scale;
+            return { x: posX - noteWidth/2, y: posY - noteHeight/2 };
+        }
+
+        function isPositionTooClose(targetPos) {
+            return allNotes.some(item => {
+                const dom = item.dom;
+                const currentX = parseInt(dom.style.left);
+                const currentY = parseInt(dom.style.top);
+                const distance = Math.sqrt(
+                    Math.pow(targetPos.x - currentX, 2) + 
+                    Math.pow(targetPos.y - currentY, 2)
+                );
+                return distance < minDistance;
+            });
+        }
+
+        function getRandomPosition() {
+            const maxX = window.innerWidth - noteWidth;
+            const maxY = window.innerHeight - noteHeight;
+            let attempts = 0;
+            let targetPos;
+
+            while (attempts < 20) {
+                targetPos = {
+                    x: Math.floor(Math.random() * maxX),
+                    y: Math.floor(Math.random() * maxY)
+                };
+                if (!isPositionTooClose(targetPos)) return targetPos;
+                attempts++;
+            }
+
+            return { x: Math.floor(Math.random() * maxX), y: Math.floor(Math.random() * maxY) };
+        }
+
+        function getRandomRotate() {
+            return (Math.random() * 20 - 10) + "deg";
+        }
+
+        function createNote(index, total) {
+            const randomBlessing = blessings[Math.floor(Math.random() * blessings.length)];
+            const randomColor = noteColors[Math.floor(Math.random() * noteColors.length)];
+            const rotate = getRandomRotate();
+
+            const initPos = { x: centerX - noteWidth/2, y: centerY - noteHeight/2 };
+
+            const note = document.createElement("div");
+            note.className = `note ${randomColor}`;
+            note.style.left = `${initPos.x}px`;
+            note.style.top = `${initPos.y}px`;
+            note.style.setProperty("--rotate", rotate);
+
+            note.innerHTML = `
+                <div class="note-header">
+                    <span class="heart-icon"></span>
+                    <span class="letter-text">信</span>
+                </div>
+                <p class="note-text">${randomBlessing}</p>
+                <button class="close-btn">×</button>
+            `;
+
+            // 关闭按钮事件
+            const closeBtn = note.querySelector(".close-btn");
+            closeBtn.addEventListener("click", () => {
+                note.style.opacity = 0;
+                setTimeout(() => {
+                    note.remove();
+                    const idx = allNotes.findIndex(item => item.dom === note);
+                    if (idx !== -1) allNotes.splice(idx, 1);
+                }, 300);
+            });
+
+            makeNoteDraggable(note);
+
+            document.body.appendChild(note);
+            allNotes.push({ dom: note, index, total });
+        }
+
+        function animateToHeart() {
+            allNotes.forEach((item, idx) => {
+                const { dom, index, total } = item;
+                const heartPos = getHeartPosition(index, total);
+                setTimeout(() => {
+                    dom.style.left = `${heartPos.x}px`;
+                    dom.style.top = `${heartPos.y}px`;
+                    dom.style.setProperty("--rotate", getRandomRotate());
+                }, idx * 30);
+            });
+        }
+
+        function animateToRandomAndStop() {
+            setTimeout(() => {
+                const notesToRemove = [];
+                
+                allNotes.forEach((item, idx) => {
+                    const { dom } = item;
+                    const randomPos = getRandomPosition();
+                    const randomRotate = getRandomRotate();
+                    
+                    dom.style.left = `${randomPos.x}px`;
+                    dom.style.top = `${randomPos.y}px`;
+                    dom.style.setProperty("--rotate", randomRotate);
+                });
+
+                setTimeout(() => {
+                    notesToRemove.forEach(idx => {
+                        const note = allNotes[idx].dom;
+                        note.style.opacity = 0;
+                        setTimeout(() => {
+                            note.remove();
+                            allNotes.splice(idx, 1);
+                        }, 300);
+                    });
+                }, 3000);
+
+            }, 7000);
+        }
+
+        // 初始化
+        function init() {
+            // 清空旧元素
+            allNotes.forEach(item => item.dom.remove());
+            allNotes.length = 0;
+            document.getElementById("starsContainer").innerHTML = "";
+            maxZIndex = 10;
+
+            // 更新窗口中心位置
+            centerX = window.innerWidth / 2;
+            centerY = window.innerHeight / 2;
+            heartRadius = Math.min(window.innerWidth, window.innerHeight) / 2.2;
+
+            // 生成星空
+            initStars();
+
+            // 创建所有纸条
+            const totalNotes = blessings.length;
+            for (let i = 0; i < totalNotes; i++) {
+                createNote(i, totalNotes);
+            }
+
+            // 启动汇聚动画
+            setTimeout(animateToHeart, 1000);
+            // 启动分散动画
+            animateToRandomAndStop();
+        }
+
+        // 页面加载初始化
+        window.addEventListener("load", init);
+
+        // 窗口 resize 时调整纸条位置
+        window.addEventListener("resize", () => {
+            allNotes.forEach(item => {
+                const dom = item.dom;
+                let x = parseInt(dom.style.left);
+                let y = parseInt(dom.style.top);
+
+                x = Math.max(0, Math.min(x, window.innerWidth - noteWidth));
+                y = Math.max(0, Math.min(y, window.innerHeight - noteHeight));
+
+                dom.style.left = `${x}px`;
+                dom.style.top = `${y}px`;
+            });
+        });
+    </script>
+</body>
+</html>
